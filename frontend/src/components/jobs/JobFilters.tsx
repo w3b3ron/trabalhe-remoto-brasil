@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { JobFilters } from '@/types';
+import type { JobFilters } from '@/types';
 
 const contractTypes = [
   { label: 'CLT', value: 'CLT' },
