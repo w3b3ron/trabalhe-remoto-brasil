@@ -19,8 +19,8 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Chamado de Server Component - não é possível setar cookies.
-            // Pode ser ignorado com segurança quando usando o middleware de refresh.
+            // Chamado de Server Component - nÃ£o Ã© possÃ­vel setar cookies.
+            // Pode ser ignorado com seguranÃ§a quando usando o middleware de refresh.
           }
         },
       },
