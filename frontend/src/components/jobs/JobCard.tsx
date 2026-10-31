@@ -16,7 +16,9 @@ function formatSalary(min: number | null, max: number | null, currency: string):
       maximumFractionDigits: 0,
     }).format(v);
   if (min && max) return `${fmt(min)} – ${fmt(max)}`;
-  return min ? `a partir de ${fmt(min)}` : `até ${fmt(max)}`;
+  if (min) return `a partir de ${fmt(min)}`;
+  if (max) return `até ${fmt(max)}`;
+  return 'Salário a negociar';
 }
 
 export function JobCard({ job }: JobCardProps) {
