@@ -9,6 +9,10 @@ export interface Company {
   logo_url: string | null;
   website: string | null;
   created_at: string;
+  about?: string | null;
+  sector?: string | null;
+  size?: string | null;
+  headquarters?: string | null;
 }
 
 export interface Job {
@@ -32,6 +36,9 @@ export interface Job {
   external_id: string | null;
   published_at: string;
   created_at: string;
+  stack?: string[];
+  responsibilities?: string[];
+  benefits?: string[];
   company?: Company;
 }
 

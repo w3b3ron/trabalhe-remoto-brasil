@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
@@ -45,13 +52,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className="min-h-screen antialiased">
+      <body className={`${inter.variable} font-sans bg-background text-text-primary dark:bg-background-dark dark:text-text-dark-primary min-h-screen antialiased`}>
         <ThemeProvider>
           <Header />
           <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6">
             {children}
           </main>
-          <footer className="border-t border-black/5 py-8 text-center text-sm text-neutral-500 dark:border-white/10">
+          <footer className="border-t border-divider py-8 text-center text-sm text-neutral-500 dark:border-white/10">
             <p>
               © {new Date().getFullYear()} TrabalheRemotoBrasil.com — Feito com
               💻 no Brasil
