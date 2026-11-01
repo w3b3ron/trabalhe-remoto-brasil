@@ -5,52 +5,58 @@ import Link from 'next/link';
 
 const stats = [
   { value: '5.000+', label: 'Vagas ativas' },
-  { value: '300+', label: 'Empresas parceria' },
+  { value: '300+', label: 'Empresas parceiras' },
   { value: '120+', label: 'Cursos indicados' },
-  { value: '98%', label: 'Taxa de atualização diária' },
+  { value: '98%', label: 'Atualização diária' },
 ];
 
 export function Hero() {
   const [query, setQuery] = useState('');
 
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent/10 via-surface-light to-surface-light px-6 py-12 text-center dark:from-accent/20 dark:via-surface-dark dark:to-surface-dark">
-      <div className="mx-auto max-w-2xl">
-        <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-          🚀 Novo: Busca por IA e recomendação de cursos
-        </span>
-        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-          Encontre a vaga{' '}
-          <span className="text-accent">100% Remoto</span> ideal para o seu perfil
+    <section className="relative overflow-hidden rounded-3xl bg-neutral-900 text-white p-8 sm:p-12 shadow-2xl border border-neutral-800">
+      {/* Background glow effect */}
+      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/30 px-4 py-1.5 text-xs font-semibold text-accent mb-6">
+          ✨ Vagas 100% Remotas • Curadoria Profissional
+        </div>
+        
+        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6">
+          Trabalhe de onde quiser.{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-emerald-400">
+            Sem fronteiras.
+          </span>
         </h1>
-        <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-          Centralizamos as melhores vagas remotas do Brasil em um só lugar,
-          com filtros avançados e recomendações inteligentes de cursos.
+        
+        <p className="text-lg text-neutral-300 mb-8 max-w-2xl mx-auto">
+          Plataforma centralizada de vagas remotas para o Brasil. Encontre oportunidades em tecnologia, design, dados e produtos.
         </p>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-10">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ex: React, Python, Design..."
-            className="tap-target w-full flex-1 rounded-full border border-neutral-200 bg-white px-5 py-3 text-base outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 dark:border-neutral-800 dark:bg-neutral-900 dark:text-white"
+            placeholder="Cargo, tecnologia ou palavra-chave..."
+            className="flex-1 rounded-2xl bg-neutral-800 border border-neutral-700 px-5 py-4 text-white placeholder-neutral-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
           />
           <Link
             href={query ? `/?q=${encodeURIComponent(query)}` : '/'}
-            className="tap-target inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-base font-medium text-white transition hover:bg-accent-hover"
+            className="inline-flex items-center justify-center rounded-2xl bg-accent px-8 py-4 font-bold text-neutral-950 transition hover:bg-emerald-400 shadow-lg shadow-accent/25"
           >
-            Buscar
+            Explorar Vagas
           </Link>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {/* Cards estilo Palm Pré OS Presentation Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-neutral-800/80">
           {stats.map((stat) => (
-            <div key={stat.label}>
-              <div className="text-2xl font-bold text-accent">{stat.value}</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400">
-                {stat.label}
-              </div>
+            <div key={stat.label} className="bg-neutral-800/50 backdrop-blur border border-neutral-700/50 rounded-2xl p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-black text-accent mb-1">{stat.value}</div>
+              <div className="text-xs font-medium text-neutral-400 uppercase tracking-wider">{stat.label}</div>
             </div>
           ))}
         </div>

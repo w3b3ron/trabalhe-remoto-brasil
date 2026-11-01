@@ -36,7 +36,7 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
   };
 
   return (
-    <div>
+    <div className="mt-8">
       <JobFilters
         filters={filters}
         onFiltersChange={handleFiltersChange}
@@ -50,7 +50,7 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}

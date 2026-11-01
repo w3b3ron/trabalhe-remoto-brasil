@@ -23,8 +23,10 @@ export default async function Page({
   const jobs = await fetchJobs(filters);
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Hero />
+      
+      {/* Grid de cards estilo Palm Pré OS */}
       <JobFiltersWrapper initialJobs={jobs} />
     </div>
   );
