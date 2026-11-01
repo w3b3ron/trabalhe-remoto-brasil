@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark' | 'palm';
+type Theme = 'light' | 'dark';
 
 const ThemeContext = createContext<{
   theme: Theme;
@@ -27,12 +27,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = document.documentElement;
     root.classList.remove('dark', 'palm-theme');
     if (t === 'dark') root.classList.add('dark');
-    if (t === 'palm') root.classList.add('palm-theme');
   };
 
   const toggleTheme = () => {
-    const themes: Theme[] = ['light', 'dark', 'palm'];
-    const next = themes[(themes.indexOf(theme) + 1) % themes.length];
+    const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     localStorage.setItem('theme', next);
     applyTheme(next);

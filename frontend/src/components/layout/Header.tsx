@@ -16,18 +16,15 @@ export function Header() {
   return (
     <header className="glass sticky top-0 z-50 border-b border-black/5 dark:border-white/10">
       <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center">
           <Image
             src="/brand/trabalheremoto_logo01.png"
             alt="TrabalheRemotoBrasil"
-            width={40}
-            height={40}
-            className="h-10 w-10"
+            width={180}
+            height={44}
+            className="h-10 w-auto object-contain"
             priority
           />
-          <span className="text-base font-semibold tracking-tight">
-            Trabalhe<span className="text-accent">Remoto</span>Brasil
-          </span>
         </Link>
 
         <div className="hidden items-center gap-1 sm:flex">
