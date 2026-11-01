@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/components/providers/ThemeProvider';
 
 const stats = [
   { value: '5.000+', label: 'Vagas ativas' },
@@ -12,7 +11,6 @@ const stats = [
 ];
 
 export function Hero() {
-  const { theme } = useTheme();
   const [query, setQuery] = useState('');
 
   return (
