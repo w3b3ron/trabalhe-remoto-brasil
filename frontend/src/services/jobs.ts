@@ -58,6 +58,76 @@ export interface Job {
 }
 
 // ============================================================
+// Serviço de Vagas
+// ============================================================
+
+export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from('jobs')
+    .select('*, company:companies(*)')
+    .eq('is_active', true)
+    .order('published_at', { ascending: false });
+
+  if (filters.query) {
+    query = query.ilike('title', `%${filters.query}%`);
+  }
+  if (filters.contract_type) {
+    query = query.eq('contract_type', filters.contract_type);
+  }
+  if (filters.experience_level) {
+    query = query.eq('experience_level', filters.experience_level);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Erro ao buscar vagas:', error.message);
+    return [];
+  }
+
+  return (data as Job[]) ?? [];
+}
+
+export async function fetchJobBySlug(slug: string): Promise<Job | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*, company:companies(*)')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .single();
+
+  if (error) {
+    console.error('Erro ao buscar vaga:', error.message);
+    return null;
+  }
+
+  return data as Job;
+}
+
+export async function fetchSimilarJobs(currentJob: Job, limit = 3): Promise<Job[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*, company:companies(*)')
+    .eq('is_active', true)
+    .neq('id', currentJob.id)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Erro ao buscar vagas semelhantes:', error.message);
+    return [];
+  }
+
+  return (data as Job[]) ?? [];
+}
+
+// ============================================================
 // Serviço de Cursos (Recomendação)
 // ============================================================
 
