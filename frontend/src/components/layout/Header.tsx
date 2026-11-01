@@ -15,16 +15,18 @@ export function Header() {
 
   return (
     <header className="glass sticky top-0 z-50 border-b border-black/5 dark:border-white/10">
-      <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/brand/trabalheremoto_logo01.png"
-            alt="TrabalheRemotoBrasil"
-            width={180}
-            height={44}
-            className="h-10 w-auto object-contain"
-            priority
-          />
+      <nav className="mx-auto flex h-20 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+        {/* Logo com destaque, maior e sobrepondo levemente a barra */}
+        <Link href="/" className="relative -top-2 flex items-center">
+          <div className="relative h-16 w-48 transition-transform hover:scale-105">
+            <Image
+              src="/brand/trabalheremoto_logo01_transparent.png"
+              alt="TrabalheRemotoBrasil"
+              fill
+              className="object-contain drop-shadow-lg"
+              priority
+            />
+          </div>
         </Link>
 
         <div className="hidden items-center gap-1 sm:flex">
