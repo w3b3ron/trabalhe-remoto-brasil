@@ -11,16 +11,16 @@ const navItems = [
 
 export function Header() {
   return (
-    <header className="glass sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur-md">
+    <header className="sticky top-0 z-[60] border-b border-divider bg-white/95 shadow-sm backdrop-blur-md dark:bg-[#0B0B0D]/95">
       <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-3 sm:px-6">
-        {/* Logo flutuante responsiva */}
-        <Link href="/" className="relative z-20 flex items-center -mb-6 sm:-mb-14">
-          <div className="relative h-14 w-40 sm:h-28 sm:w-72 transition-transform hover:scale-105 drop-shadow-md">
+        // Logo flutuante (Ajustada para não sobrepor o conteúdo ao rolar)
+        <Link href="/" className="relative z-50 flex items-center">
+          <div className="relative h-12 w-32 sm:h-20 sm:w-56 transition-transform hover:scale-105">
             <Image
               src="/brand/trabalheremoto_logo01_transparent.png"
               alt="TrabalheRemotoBrasil"
               fill
-              className="object-contain object-left-top"
+              className="object-contain"
               priority
             />
           </div>
