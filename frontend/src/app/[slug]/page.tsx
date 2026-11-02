@@ -58,7 +58,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
   const location = job.company?.headquarters ?? job.location ?? 'Remoto - Brasil';
 
-        <div>
+  return (
+    <div>
       {/* Breadcrumbs */}
       <nav className='text-sm text-neutral-500' aria-label='Você está em'>
         ← Vagas / {job.company?.name ?? 'Empresa'} / {job.title}
