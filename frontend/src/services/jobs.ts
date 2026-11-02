@@ -34,6 +34,86 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
   return (data as Job[]) ?? [];
 }
 
+// Retorna as N vagas mais recentes (para home page)
+// Usa published_at com fallback para created_at
+export async function fetchLatestJobs(limit = 12): Promise<Job[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*, company:companies(*)')
+    .eq('is_active', true)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Erro ao buscar vagas recentes:', error.message);
+    return [];
+  }
+
+  return (data as Job[]) ?? [];
+}
+
+// Busca vagas similares baseada em stack/tags da empresa
+export async function fetchSimilarJobs(currentJobId: string, currentCompanyId: string, currentStack: string[] = [], limit = 3): Promise<Job[]> {
+  const supabase = await createClient();
+
+  // Primeiro tenta buscar por stack similar
+  let query = supabase
+    .from('jobs')
+    .select('*, company:companies(*)')
+    .eq('is_active', true)
+    .neq('id', currentJobId)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (currentStack.length > 0) {
+    query = query.contains('stack', currentStack);
+  }
+
+  let { data, error } = await query;
+
+  // Se não encontrou por stack, busca pela mesma empresa
+  if ((!data || data.length === 0) && currentCompanyId) {
+    const { data: companyJobs, error: companyError } = await supabase
+      .from('jobs')
+      .select('*, company:companies(*)')
+      .eq('is_active', true)
+      .eq('company_id', currentCompanyId)
+      .neq('id', currentJobId)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+    if (!companyError && companyJobs && companyJobs.length > 0) {
+      data = companyJobs;
+      error = null;
+    }
+  }
+
+  // Fallback: vagas mais recentes excluindo a atual
+  if ((!data || data.length === 0)) {
+    const { data: recentJobs, error: recentError } = await supabase
+      .from('jobs')
+      .select('*, company:companies(*)')
+      .eq('is_active', true)
+      .neq('id', currentJobId)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+    if (!recentError && recentJobs) {
+      data = recentJobs;
+      error = null;
+    }
+  }
+
+  if (error) {
+    console.error('Erro ao buscar vagas similares:', error.message);
+    return [];
+  }
+
+  return (data as Job[]) ?? [];
+}
+
 export async function fetchJobBySlug(slug: string): Promise<Job | null> {
   const supabase = await createClient();
 

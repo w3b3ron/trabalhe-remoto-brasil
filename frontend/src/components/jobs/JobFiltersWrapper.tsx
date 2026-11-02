@@ -15,9 +15,9 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
 
   const handleFiltersChange = (newFilters: JobFiltersType) => {
     setFilters(newFilters);
-    
+
     let filtered = initialJobs;
-    
+
     if (newFilters.contract_type) {
       filtered = filtered.filter(job => job.contract_type === newFilters.contract_type);
     }
@@ -26,12 +26,13 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
     }
     if (newFilters.query) {
       const query = newFilters.query.toLowerCase();
-      filtered = filtered.filter(job => 
+      filtered = filtered.filter(job =>
         job.title.toLowerCase().includes(query) ||
-        job.tags.some(tag => tag.toLowerCase().includes(query))
+        job.tags.some(tag => tag.toLowerCase().includes(query)) ||
+        job.stack.some(tag => tag.toLowerCase().includes(query))
       );
     }
-    
+
     setFilteredJobs(filtered);
   };
 
@@ -43,14 +44,14 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
       />
 
       {filteredJobs.length === 0 ? (
-        <div className="glass rounded-app-card p-12 text-center">
-          <p className="text-lg font-medium">Nenhuma vaga encontrada</p>
-          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+        <div className="glass rounded-card p-12 text-center">
+          <p className="text-lg font-medium text-text-primary">Nenhuma vaga encontrada</p>
+          <p className="mt-2 text-body-sm text-text-secondary">
             Tente outros termos de busca ou remova os filtros.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid-jobs">
           {filteredJobs.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}

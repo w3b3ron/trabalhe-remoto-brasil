@@ -12,9 +12,12 @@ CREATE TABLE IF NOT EXISTS public.companies (
   slug VARCHAR(255) UNIQUE NOT NULL,
   logo_url TEXT,
   website TEXT,
+  about TEXT,
+  sector TEXT,
+  size TEXT,
+  headquarters TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- 2. JOBS TABLE
 CREATE TABLE IF NOT EXISTS public.jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -30,6 +33,9 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   salary_currency VARCHAR(10) DEFAULT 'BRL',
   apply_url TEXT NOT NULL,
   tags TEXT[] DEFAULT '{}',
+  stack TEXT[] DEFAULT '{}',
+  responsibilities TEXT[] DEFAULT '{}',
+  benefits TEXT[] DEFAULT '{}',
   is_featured BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
   views_count INT DEFAULT 0,
@@ -43,7 +49,8 @@ CREATE TABLE IF NOT EXISTS public.jobs (
 CREATE INDEX IF NOT EXISTS idx_jobs_is_active ON public.jobs(is_active);
 CREATE INDEX IF NOT EXISTS idx_jobs_published_at ON public.jobs(published_at DESC);
 CREATE INDEX IF NOT EXISTS idx_jobs_tags ON public.jobs USING GIN(tags);
-
+CREATE INDEX IF NOT EXISTS idx_jobs_stack ON public.jobs USING GIN(stack);
+CREATE INDEX IF NOT EXISTS idx_jobs_company_id ON public.jobs(company_id);
 -- 3. COURSES TABLE
 CREATE TABLE IF NOT EXISTS public.courses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -83,17 +90,16 @@ CREATE POLICY "Allow public read access to companies" ON public.companies FOR SE
 CREATE POLICY "Allow public read access to active jobs" ON public.jobs FOR SELECT USING (is_active = true);
 CREATE POLICY "Allow public read access to courses" ON public.courses FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to products" ON public.products FOR SELECT USING (true);
-
 -- SEED DATA FOR TESTING
-INSERT INTO public.companies (id, name, slug, logo_url, website) VALUES
-('11111111-1111-1111-1111-111111111111', 'Nubank', 'nubank', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&h=120&q=80', 'https://nubank.com.br'),
-('22222222-2222-2222-2222-222222222222', 'iFood', 'ifood', 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=120&h=120&q=80', 'https://ifood.com.br'),
-('33333333-3333-3333-3333-333333333333', 'VTEX', 'vtex', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=120&h=120&q=80', 'https://vtex.com');
+INSERT INTO public.companies (id, name, slug, logo_url, website, about, sector, size, headquarters) VALUES
+('11111111-1111-1111-1111-111111111111', 'Nubank', 'nubank', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&h=120&q=80', 'https://nubank.com.br', 'O Nubank é uma plataforma de serviços financeiros que nasceu para devolver às pessoas o controle sobre o seu dinheiro. Somos uma das maiores plataformas digitais do mundo.', 'Fintech', '1000+', 'São Paulo, SP'),
+('22222222-2222-2222-2222-222222222222', 'iFood', 'ifood', 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=120&h=120&q=80', 'https://ifood.com.br', 'O iFood é a maior plataforma de delivery da América Latina, conectando restaurantes, mercados e consumidores.', 'Foodtech', '1000+', 'Osasco, SP'),
+('33333333-3333-3333-3333-333333333333', 'VTEX', 'vtex', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=120&h=120&q=80', 'https://vtex.com', 'A VTEX é uma plataforma de comércio digital para empresas globais, permitindo comércio unificado em múltiplos canais.', 'SaaS / E-commerce', '1000+', 'Rio de Janeiro, RJ');
 
-INSERT INTO public.jobs (id, company_id, title, slug, description, location, contract_type, experience_level, salary_min, salary_max, apply_url, tags, is_featured) VALUES
-('a1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Desenvolvedor Full Stack React / Node.js', 'desenvolvedor-full-stack-react-node-nubank', 'Buscamos desenvolvedor(a) Full Stack para atuar em sistemas distribuídos de alta escala. Requisitos: React, Node.js, TypeScript e GraphQL.', '100% Remoto - Brasil', 'PJ', 'Senior', 12000.00, 16000.00, 'https://nubank.com.br/careers', ARRAY['React', 'Node.js', 'TypeScript', 'GraphQL'], true),
-('a2222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Engenheiro de Dados Python / Airflow', 'engenheiro-de-dados-python-ifood', 'Atue na construção de pipelines de ETL e processamento em lote e realtime. Requisitos: Python, Airflow, Spark e SQL.', '100% Remoto - Brasil', 'CLT', 'Pleno', 9000.00, 12500.00, 'https://ifood.com.br/careers', ARRAY['Python', 'Airflow', 'Spark', 'SQL'], true),
-('a3333333-3333-3333-3333-333333333333', '33333333-3333-3333-3333-333333333333', 'Product Designer / UI/UX', 'product-designer-vtex', 'Projeta interfaces elegantes e acessíveis para plataformas e-commerce globais. Domínio de Figma e princípios Apple HIG.', '100% Remoto - Brasil', 'CLT', 'Senior', 10000.00, 14000.00, 'https://vtex.com/careers', ARRAY['Figma', 'UI/UX', 'Design Systems', 'Apple HIG'], false);
+INSERT INTO public.jobs (id, company_id, title, slug, description, location, contract_type, experience_level, salary_min, salary_max, apply_url, tags, stack, responsibilities, benefits, is_featured) VALUES
+('a1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Desenvolvedor Full Stack React / Node.js', 'desenvolvedor-full-stack-react-node-nubank', 'Buscamos desenvolvedor(a) Full Stack para atuar em sistemas distribuídos de alta escala. Requisitos: React, Node.js, TypeScript e GraphQL.', '100% Remoto - Brasil', 'PJ', 'Senior', 12000.00, 16000.00, 'https://nubank.com.br/careers', ARRAY['React', 'Node.js', 'TypeScript', 'GraphQL'], ARRAY['React', 'Node.js', 'TypeScript', 'GraphQL'], ARRAY['Desenvolver e manter aplicações web de alta performance', 'Colaborar com times de produto e design', 'Revisar código e garantir qualidade'], ARRAY['Vale refeição', 'Plano de saúde', 'Auxílio home office', 'Horário flexível'], true),
+('a2222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222', 'Engenheiro de Dados Python / Airflow', 'engenheiro-de-dados-python-ifood', 'Atue na construção de pipelines de ETL e processamento em lote e realtime. Requisitos: Python, Airflow, Spark e SQL.', '100% Remoto - Brasil', 'CLT', 'Pleno', 9000.00, 12500.00, 'https://ifood.com.br/careers', ARRAY['Python', 'Airflow', 'Spark', 'SQL'], ARRAY['Python', 'Airflow', 'Spark', 'SQL'], ARRAY['Construir e manter pipelines de dados', 'Otimizar processos de ETL', 'Garantir qualidade e observabilidade dos dados'], ARRAY['Vale refeição', 'Plano de saúde', 'Auxílio educação', 'Day off no aniversário'], true),
+('a3333333-3333-3333-3333-333333333333', '33333333-3333-3333-3333-333333333333', 'Product Designer / UI/UX', 'product-designer-vtex', 'Projeta interfaces elegantes e acessíveis para plataformas e-commerce globais. Domínio de Figma e princípios Apple HIG.', '100% Remoto - Brasil', 'CLT', 'Senior', 10000.00, 14000.00, 'https://vtex.com/careers', ARRAY['Figma', 'UI/UX', 'Design Systems', 'Apple HIG'], ARRAY['Figma', 'Design Systems', 'UI/UX', 'Apple HIG'], ARRAY['Projetar interfaces acessíveis e elegantes', 'Manter e evoluir o Design System', 'Realizar testes de usabilidade'], ARRAY['Vale refeição', 'Plano de saúde', 'Orçamento para conferências', 'Equipamento de ponta'], false);
 
 INSERT INTO public.courses (title, provider, description, affiliate_url, image_url, price, rating, related_tags) VALUES
 ('Formação React & Next.js do Zero ao Avançado', 'Udemy', 'Aprenda a construir aplicações modernas com SSR, Server Components e Tailwind CSS.', 'https://udemy.com', 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=400&q=80', 89.90, 4.8, ARRAY['React', 'Next.js', 'TypeScript']),

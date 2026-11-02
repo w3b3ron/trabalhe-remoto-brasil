@@ -8,6 +8,10 @@ export interface Company {
   slug: string;
   logo_url: string | null;
   website: string | null;
+  about: string | null;
+  sector: string | null;
+  size: string | null;
+  headquarters: string | null;
   created_at: string;
 }
 
@@ -25,6 +29,9 @@ export interface Job {
   salary_currency: string;
   apply_url: string;
   tags: string[];
+  stack: string[];
+  responsibilities: string[];
+  benefits: string[];
   is_featured: boolean;
   is_active: boolean;
   views_count: number;
