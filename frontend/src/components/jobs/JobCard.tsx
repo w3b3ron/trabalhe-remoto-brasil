@@ -1,6 +1,13 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Job } from '@/types';
+import {
+  companyFacts,
+  experienceLabel,
+  formatPublished,
+  formatSalary,
+  websiteHost,
+} from '@/lib/job-format';
+import { CompanyLogo } from './CompanyLogo';
 import { SaveJobButton } from './SaveJobButton';
 
 interface JobCardProps {
@@ -9,78 +16,6 @@ interface JobCardProps {
 
 const MAX_TAGS = 6;
 
-function formatSalary(min: number | null, max: number | null, currency: string): string {
-  if (!min && !max) return 'Salário a negociar';
-  const fmt = (v: number) =>
-    new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: currency || 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(v);
-  if (min && max) return `${fmt(min)} – ${fmt(max)}`;
-  if (min) return `a partir de ${fmt(min)}`;
-  if (max) return `até ${fmt(max)}`;
-  return 'Salário a negociar';
-}
-
-/** Data relativa em pt-BR ("hoje", "há 3 dias"...). Retorna null se não houver data válida. */
-function formatPublished(iso?: string | null): string | null {
-  if (!iso) return null;
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return null;
-
-  const days = Math.floor((Date.now() - date.getTime()) / 86_400_000);
-  if (days <= 0) return 'hoje';
-  if (days === 1) return 'ontem';
-  if (days < 30) return `há ${days} dias`;
-  if (days < 365) {
-    const months = Math.floor(days / 30);
-    return `há ${months} ${months === 1 ? 'mês' : 'meses'}`;
-  }
-  const years = Math.floor(days / 365);
-  return `há ${years} ${years === 1 ? 'ano' : 'anos'}`;
-}
-
-function websiteHost(url?: string | null): string | null {
-  if (!url) return null;
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return null;
-  }
-}
-
-function CompanyLogo({
-  name,
-  logoUrl,
-  size,
-  className,
-}: {
-  name: string;
-  logoUrl: string | null | undefined;
-  size: number;
-  className: string;
-}) {
-  const box = `relative shrink-0 overflow-hidden ${className}`;
-  if (logoUrl) {
-    return (
-      <div className={`${box} bg-neutral-100 dark:bg-neutral-800`} style={{ width: size, height: size }}>
-        <Image src={logoUrl} alt={name} fill sizes={`${size}px`} className="object-contain p-1" />
-      </div>
-    );
-  }
-  return (
-    <div
-      aria-hidden="true"
-      className={`${box} flex items-center justify-center bg-neutral-800 font-extrabold text-white dark:bg-neutral-200 dark:text-neutral-900`}
-      style={{ width: size, height: size, fontSize: size * 0.42 }}
-    >
-      {name.trim().charAt(0).toUpperCase() || '?'}
-    </div>
-  );
-}
-
 /**
  * Card de vaga: sempre exibido completo (sem expandir/recolher).
  * Campos ausentes são omitidos; nunca exibimos placeholders.
@@ -88,15 +23,17 @@ function CompanyLogo({
 export function JobCard({ job }: JobCardProps) {
   const company = job.company;
   const companyName = company?.name ?? 'Empresa não informada';
+  const level = experienceLabel(job.experience_level);
   const tags = job.tags ?? [];
   const visibleTags = tags.slice(0, MAX_TAGS);
   const hiddenTags = tags.length - visibleTags.length;
   const published = formatPublished(job.published_at);
   const host = websiteHost(company?.website);
+  const facts = companyFacts(company);
 
   const details = [
     { label: 'Contrato', value: job.contract_type },
-    { label: 'Senioridade', value: job.experience_level },
+    { label: 'Senioridade', value: level },
     { label: 'Modalidade', value: job.location },
     { label: 'Publicada em', value: published },
   ].filter((d) => Boolean(d.value));
@@ -106,7 +43,12 @@ export function JobCard({ job }: JobCardProps) {
       {/* Linha superior: logo, empresa, destaque */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <CompanyLogo name={companyName} logoUrl={company?.logo_url} size={48} className="rounded-[14px]" />
+          <CompanyLogo
+            name={companyName}
+            logoUrl={company?.logo_url}
+            size={48}
+            className="rounded-[14px]"
+          />
           <span className="truncate text-[15px] font-semibold text-neutral-700 dark:text-neutral-300">
             {companyName}
           </span>
@@ -130,9 +72,9 @@ export function JobCard({ job }: JobCardProps) {
             {job.contract_type}
           </span>
         )}
-        {job.experience_level && (
+        {level && (
           <span className="rounded-lg bg-[#F0F0F3] px-2.5 py-1.5 text-[13px] font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-            {job.experience_level}
+            {level}
           </span>
         )}
         {job.location && (
@@ -178,7 +120,9 @@ export function JobCard({ job }: JobCardProps) {
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3.5">
           {details.map((d) => (
             <div key={d.label} className="min-w-0">
-              <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">{d.label}</dt>
+              <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                {d.label}
+              </dt>
               <dd className="text-[15px] font-semibold" suppressHydrationWarning>
                 {d.value}
               </dd>
@@ -188,19 +132,31 @@ export function JobCard({ job }: JobCardProps) {
       )}
 
       {/* Sobre a empresa (só quando há dado real) */}
-      {host && (
+      {(facts.length > 0 || host) && (
         <div className="flex items-center gap-3 rounded-2xl bg-[#F5F5F7] p-3.5 dark:bg-white/5">
-          <CompanyLogo name={companyName} logoUrl={company?.logo_url} size={40} className="rounded-xl" />
+          <CompanyLogo
+            name={companyName}
+            logoUrl={company?.logo_url}
+            size={40}
+            className="rounded-xl"
+          />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold">Sobre a {companyName}</p>
-            <a
-              href={company?.website ?? '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block truncate text-[13px] text-neutral-500 underline-offset-2 hover:underline dark:text-neutral-400"
-            >
-              {host} ↗
-            </a>
+            {facts.length > 0 && (
+              <p className="line-clamp-2 text-[13px] text-neutral-500 dark:text-neutral-400">
+                {facts.join(' · ')}
+              </p>
+            )}
+            {host && (
+              <a
+                href={company?.website ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block truncate text-[13px] text-neutral-500 underline-offset-2 hover:underline dark:text-neutral-400"
+              >
+                {host} ↗
+              </a>
+            )}
           </div>
         </div>
       )}

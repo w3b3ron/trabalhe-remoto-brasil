@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS public.companies (
   slug VARCHAR(255) UNIQUE NOT NULL,
   logo_url TEXT,
   website TEXT,
+  about TEXT,
+  sector TEXT,
+  size TEXT,
+  headquarters TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -30,6 +34,8 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   salary_currency VARCHAR(10) DEFAULT 'BRL',
   apply_url TEXT NOT NULL,
   tags TEXT[] DEFAULT '{}',
+  responsibilities TEXT[] DEFAULT '{}',
+  benefits TEXT[] DEFAULT '{}',
   is_featured BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
   views_count INT DEFAULT 0,

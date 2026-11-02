@@ -8,6 +8,11 @@ export interface Company {
   slug: string;
   logo_url: string | null;
   website: string | null;
+  // Opcionais (migration docs/migrations/2026-11-job-details.sql)
+  about?: string | null;
+  sector?: string | null;
+  size?: string | null;
+  headquarters?: string | null;
   created_at: string;
 }
 
@@ -25,6 +30,9 @@ export interface Job {
   salary_currency: string;
   apply_url: string;
   tags: string[];
+  // Opcionais (migration docs/migrations/2026-11-job-details.sql)
+  responsibilities?: string[] | null;
+  benefits?: string[] | null;
   is_featured: boolean;
   is_active: boolean;
   views_count: number;
