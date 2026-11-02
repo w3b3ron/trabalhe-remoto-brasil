@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import { fetchJobBySlug } from '@/services/jobs';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
