@@ -26,6 +26,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
+          'Inter Variable',
           '-apple-system',
           'BlinkMacSystemFont',
           'SF Pro Display',
