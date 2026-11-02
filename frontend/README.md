@@ -29,7 +29,7 @@ frontend/
 │   │   ├── layout/Header.tsx   # Header glassmorphism
 │   │   ├── providers/ThemeProvider.tsx  # Dark/Light mode
 │   │   ├── home/Hero.tsx       # Hero section
-│   │   └── jobs/               # JobCard, JobFilters
+│   │   └── jobs/               # JobCard, SaveJobButton, JobFilters
 │   ├── lib/supabase/          # Clientes Supabase (browser + server)
 │   ├── services/jobs.ts        # Serviços de dados (vagas, cursos, produtos)
 │   └── types/index.ts          # Tipos do domínio
@@ -45,7 +45,7 @@ frontend/
 
 | Rota | Descrição |
 |---|---|
-| `/` | Listagem de vagas com filtros |
+| `/` | As 12 vagas mais recentes (3 colunas x 4 linhas) + filtros; com filtro ativo mostra todos os resultados |
 | `/vaga/[slug]` | Detalhe da vaga + cursos recomendados |
 | `/loja` | Loja do Home Office |
 | `/cursos` | Catálogo de cursos |
@@ -53,6 +53,10 @@ frontend/
 | `/contato` | Contato |
 | `/privacidade` | Política de privacidade |
 | `/termos` | Termos de uso |
+
+## Card de vaga
+
+`JobCard` é sempre exibido completo (sem expandir/recolher): empresa, título, chips de contrato, senioridade e modalidade, descrição (até 4 linhas), tecnologias (`tags`, máx. 6), grade de detalhes, bloco "Sobre a empresa" (só se a empresa tiver `website`), salário, botão **Salvar vaga** (`SaveJobButton`, guarda ids em `localStorage` na chave `trb:saved-jobs`) e **Ver vaga →** para `/vaga/[slug]`. Campos ausentes são omitidos, nunca exibidos como placeholder.
 
 ## Como Rodar
 
