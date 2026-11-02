@@ -86,7 +86,7 @@ export function JobCard({ job }: JobCardProps) {
         {/* Linha superior: logo 48x48 (raio 14px), nome da empresa, badge Destaque, chevron 32px */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[14px] bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center font-bold text-accent">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-[14px] bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center font-bold text-accent">
               {logoUrl ? (
                 <Image src={logoUrl} alt={company?.name ?? 'Empresa'} fill sizes="48px" className="object-cover" />
               ) : (
@@ -110,14 +110,14 @@ export function JobCard({ job }: JobCardProps) {
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-text-secondary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             aria-hidden="true"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 6l4 4 4-4" />
             </svg>
           </span>
         </div>
 
-        {/* Título: 21px, 700, line-height 1.25, quebra em até 2 linhas (sem truncar em 1) */}
-        <h3 className="mt-4 text-[21px] font-bold leading-[1.25] text-text-primary dark:text-text-dark-primary">
+        {/* Título: 24px, 700, line-height 1.3, quebra em até 2 linhas (sem truncar em 1) */}
+        <h3 className="mt-4 text-[24px] font-bold leading-[1.3] text-text-primary dark:text-text-dark-primary">
           {job.title}
         </h3>
 
