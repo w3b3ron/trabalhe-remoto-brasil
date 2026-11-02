@@ -27,13 +27,15 @@ function writeSaved(ids: string[]) {
 interface SaveJobButtonProps {
   jobId: string;
   jobTitle: string;
+  /** "icon": botão circular (card). "label": pílula com texto (página da vaga). */
+  variant?: 'icon' | 'label';
 }
 
 /**
  * Botão "Salvar vaga" (sem login): guarda os ids em localStorage.
  * O estado só é lido após a montagem para evitar erro de hidratação.
  */
-export function SaveJobButton({ jobId, jobTitle }: SaveJobButtonProps) {
+export function SaveJobButton({ jobId, jobTitle, variant = 'icon' }: SaveJobButtonProps) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -48,6 +50,19 @@ export function SaveJobButton({ jobId, jobTitle }: SaveJobButtonProps) {
     writeSaved(next);
     setSaved(next.includes(jobId));
   };
+
+  if (variant === 'label') {
+    return (
+      <button
+        type="button"
+        onClick={toggle}
+        aria-pressed={saved}
+        className="tap-target flex-1 rounded-full border border-neutral-300 bg-white px-4 text-[15px] font-semibold text-neutral-900 transition hover:bg-neutral-50 dark:border-white/20 dark:bg-transparent dark:text-neutral-100 dark:hover:bg-white/10"
+      >
+        {saved ? 'Vaga salva' : 'Salvar vaga'}
+      </button>
+    );
+  }
 
   return (
     <button
