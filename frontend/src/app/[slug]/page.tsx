@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const job = await fetchJobBySlug(slug);
