@@ -13,7 +13,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-[60] border-b border-divider bg-white/95 shadow-sm backdrop-blur-md dark:bg-[#0B0B0D]/95">
       <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-3 sm:px-6">
-        // Logo flutuante (Ajustada para não sobrepor o conteúdo ao rolar)
+                {/* Logo flutuante (Ajustada para não sobrepor o conteúdo ao rolar) */}
         <Link href="/" className="relative z-50 flex items-center">
           <div className="relative h-12 w-32 sm:h-20 sm:w-56 transition-transform hover:scale-105">
             <Image
