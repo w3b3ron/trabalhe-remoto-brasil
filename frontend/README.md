@@ -29,7 +29,7 @@ frontend/
 │   │   ├── layout/Header.tsx   # Header glassmorphism
 │   │   ├── providers/ThemeProvider.tsx  # Dark/Light mode
 │   │   ├── home/Hero.tsx       # Hero section
-│   │   └── jobs/               # JobCard, JobFilters
+│   │   └── jobs/               # JobCard, JobDetail, SaveJobButton, ShareButton, CompanyLogo, JobFilters
 │   ├── lib/supabase/          # Clientes Supabase (browser + server)
 │   ├── services/jobs.ts        # Serviços de dados (vagas, cursos, produtos)
 │   └── types/index.ts          # Tipos do domínio
@@ -45,14 +45,26 @@ frontend/
 
 | Rota | Descrição |
 |---|---|
-| `/` | Listagem de vagas com filtros |
-| `/vaga/[slug]` | Detalhe da vaga + cursos recomendados |
+| `/` | As 12 vagas mais recentes (3 colunas x 4 linhas) + filtros; com filtro ativo mostra todos os resultados |
+| `/vaga/[slug]` | Detalhe da vaga (sobre, tecnologias, responsabilidades, benefícios, empresa, vagas semelhantes) + cursos recomendados |
 | `/loja` | Loja do Home Office |
 | `/cursos` | Catálogo de cursos |
 | `/sobre` | Sobre o projeto |
 | `/contato` | Contato |
 | `/privacidade` | Política de privacidade |
 | `/termos` | Termos de uso |
+
+## Card de vaga
+
+`JobCard` é sempre exibido completo (sem expandir/recolher): empresa, título, chips de contrato, senioridade e modalidade, descrição (até 4 linhas), tecnologias (`tags`, máx. 6), grade de detalhes, bloco "Sobre a empresa" (só se a empresa tiver `website`), salário, botão **Salvar vaga** (`SaveJobButton`, guarda ids em `localStorage` na chave `trb:saved-jobs`) e **Ver vaga →** para `/vaga/[slug]`. Campos ausentes são omitidos, nunca exibidos como placeholder.
+
+### Dados opcionais (migration)
+
+Para preencher o bloco "Sobre a empresa" e as seções "Responsabilidades" e "Benefícios" da página da vaga, execute `docs/migrations/2026-11-job-details.sql` no SQL Editor do Supabase (idempotente). Ela adiciona `companies.about/sector/size/headquarters` e `jobs.responsibilities/benefits`. Sem a migration, o site funciona normalmente e essas seções simplesmente não aparecem.
+
+### Fonte
+
+A fonte Inter é empacotada localmente com `@fontsource-variable/inter` (sem depender do Google Fonts no build).
 
 ## Como Rodar
 

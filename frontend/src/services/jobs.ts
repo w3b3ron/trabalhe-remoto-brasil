@@ -52,6 +52,41 @@ export async function fetchJobBySlug(slug: string): Promise<Job | null> {
   return data as Job;
 }
 
+/**
+ * Vagas semelhantes: mesmas tecnologias (tags) primeiro; se faltar, completa
+ * com as vagas mais recentes. Nunca inclui a própria vaga.
+ */
+export async function fetchSimilarJobs(job: Job, limit = 3): Promise<Job[]> {
+  const supabase = await createClient();
+
+  const base = () =>
+    supabase
+      .from('jobs')
+      .select('*, company:companies(*)')
+      .eq('is_active', true)
+      .neq('id', job.id)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+  let similar: Job[] = [];
+  if (job.tags?.length) {
+    const { data, error } = await base().overlaps('tags', job.tags);
+    if (error) console.error('Erro ao buscar vagas semelhantes:', error.message);
+    else similar = (data as Job[]) ?? [];
+  }
+
+  if (similar.length >= limit) return similar;
+
+  const { data, error } = await base();
+  if (error) {
+    console.error('Erro ao buscar vagas recentes:', error.message);
+    return similar;
+  }
+  const seen = new Set(similar.map((j) => j.id));
+  const filler = ((data as Job[]) ?? []).filter((j) => !seen.has(j.id));
+  return [...similar, ...filler].slice(0, limit);
+}
+
 // ============================================================
 // Serviço de Cursos (Recomendação)
 // ============================================================

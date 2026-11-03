@@ -9,9 +9,20 @@ interface JobFiltersWrapperProps {
   initialJobs: Job[];
 }
 
+// Sem filtros ativos, a home mostra as vagas mais recentes (3 colunas x 4 linhas).
+const LATEST_JOBS_LIMIT = 12;
+
 export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
   const [filters, setFilters] = useState<JobFiltersType>({});
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
+  const [showAll, setShowAll] = useState(false);
+
+  const hasActiveFilters = Boolean(
+    filters.query || filters.contract_type || filters.experience_level
+  );
+  const limited = !hasActiveFilters && !showAll;
+  const visibleJobs = limited ? filteredJobs.slice(0, LATEST_JOBS_LIMIT) : filteredJobs;
+  const hiddenCount = filteredJobs.length - visibleJobs.length;
 
   const handleFiltersChange = (newFilters: JobFiltersType) => {
     setFilters(newFilters);
@@ -50,11 +61,30 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
+        <section aria-labelledby="titulo-vagas">
+          <h2
+            id="titulo-vagas"
+            className="mb-5 text-[28px] font-extrabold tracking-tight"
+          >
+            {hasActiveFilters ? 'Resultados da busca' : 'Vagas mais recentes'}
+          </h2>
+          <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleJobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+          {hiddenCount > 0 && (
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAll(true)}
+                className="tap-target rounded-full border border-neutral-300 bg-white px-6 text-[15px] font-semibold transition hover:bg-neutral-50 dark:border-white/20 dark:bg-transparent dark:hover:bg-white/10"
+              >
+                Ver todas as vagas ({filteredJobs.length})
+              </button>
+            </div>
+          )}
+        </section>
       )}
     </div>
   );

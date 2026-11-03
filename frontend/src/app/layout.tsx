@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import '@fontsource-variable/inter';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
