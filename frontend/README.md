@@ -29,7 +29,7 @@ frontend/
 │   │   ├── layout/Header.tsx   # Header glassmorphism
 │   │   ├── providers/ThemeProvider.tsx  # Dark/Light mode
 │   │   ├── home/Hero.tsx       # Hero section
-│   │   └── jobs/               # JobCard, JobDetail, SaveJobButton, ShareButton, CompanyLogo, JobFilters
+│   │   └── jobs/               # JobList, JobCard, JobRow, JobDetail, SaveJobButton, ShareButton, CompanyLogo
 │   ├── lib/supabase/          # Clientes Supabase (browser + server)
 │   ├── services/jobs.ts        # Serviços de dados (vagas, cursos, produtos)
 │   └── types/index.ts          # Tipos do domínio

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { fetchJobs } from '@/services/jobs';
 import { Hero } from '@/components/home/Hero';
-import { JobFiltersWrapper } from '@/components/jobs/JobFiltersWrapper';
+import { JobList } from '@/components/jobs/JobList';
 import type { Job } from '@/types';
 
 export const metadata: Metadata = {
@@ -32,12 +32,15 @@ export default async function Page({
 }) {
   const sp = await searchParams;
 
-  // O contrato e a senioridade filtram no servidor; a busca por texto (?q=) é aplicada
-  // no cliente (título, empresa, tags e descrição), junto com os filtros da tela.
+  // Os filtros ficam só no banner (Hero), que envia ?q=&contract=&level= para esta página.
+  // Contrato e senioridade filtram no servidor; a busca por texto (?q=) é aplicada na
+  // lista (título, empresa, descrição e tags).
   const jobs = await fetchJobs({
     contract_type: sp.contract,
     experience_level: sp.level,
   });
+
+  const hasFilters = Boolean(sp.q || sp.contract || sp.level);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -45,13 +48,15 @@ export default async function Page({
         topTags={topTagsOf(jobs)}
         initialQuery={sp.q ?? ''}
         initialContract={sp.contract ?? ''}
+        initialLevel={sp.level ?? ''}
       />
 
-      <JobFiltersWrapper
-        // key: ao pesquisar de novo (nova ?q=), o estado do cliente é recriado.
+      <JobList
+        // key: a cada nova busca, o estado da lista ("ver todas") é recriado.
         key={`${sp.q ?? ''}|${sp.contract ?? ''}|${sp.level ?? ''}`}
-        initialJobs={jobs}
-        initialQuery={sp.q}
+        jobs={jobs}
+        query={sp.q}
+        hasFilters={hasFilters}
       />
     </div>
   );
