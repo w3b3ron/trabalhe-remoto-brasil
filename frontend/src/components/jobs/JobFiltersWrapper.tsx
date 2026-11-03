@@ -8,15 +8,43 @@ import type { JobFilters as JobFiltersType, Job } from '@/types';
 
 interface JobFiltersWrapperProps {
   initialJobs: Job[];
+  /** Busca vinda da URL (?q=...), aplicada aqui no cliente (título, empresa, tags e descrição). */
+  initialQuery?: string;
+}
+
+function applyFilters(jobs: Job[], f: JobFiltersType): Job[] {
+  let filtered = jobs;
+
+  if (f.contract_type) {
+    filtered = filtered.filter((job) => job.contract_type === f.contract_type);
+  }
+  if (f.experience_level) {
+    filtered = filtered.filter((job) => job.experience_level === f.experience_level);
+  }
+  if (f.query) {
+    const query = f.query.toLowerCase();
+    filtered = filtered.filter(
+      (job) =>
+        job.title.toLowerCase().includes(query) ||
+        (job.company?.name ?? '').toLowerCase().includes(query) ||
+        (job.description ?? '').toLowerCase().includes(query) ||
+        (job.tags ?? []).some((tag) => tag.toLowerCase().includes(query))
+    );
+  }
+  return filtered;
 }
 
 // Home: 3 vagas em destaque (cards) + 7 vagas em linhas horizontais.
 const FEATURED_CARDS = 3;
 const LIST_ROWS = 7;
 
-export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
-  const [filters, setFilters] = useState<JobFiltersType>({});
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs);
+export function JobFiltersWrapper({ initialJobs, initialQuery }: JobFiltersWrapperProps) {
+  const [filters, setFilters] = useState<JobFiltersType>(
+    initialQuery ? { query: initialQuery } : {}
+  );
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>(() =>
+    applyFilters(initialJobs, initialQuery ? { query: initialQuery } : {})
+  );
   const [showAll, setShowAll] = useState(false);
 
   const hasActiveFilters = Boolean(
@@ -45,24 +73,7 @@ export function JobFiltersWrapper({ initialJobs }: JobFiltersWrapperProps) {
 
   const handleFiltersChange = (newFilters: JobFiltersType) => {
     setFilters(newFilters);
-
-    let filtered = initialJobs;
-
-    if (newFilters.contract_type) {
-      filtered = filtered.filter(job => job.contract_type === newFilters.contract_type);
-    }
-    if (newFilters.experience_level) {
-      filtered = filtered.filter(job => job.experience_level === newFilters.experience_level);
-    }
-    if (newFilters.query) {
-      const query = newFilters.query.toLowerCase();
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(query) ||
-        job.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
-
-    setFilteredJobs(filtered);
+    setFilteredJobs(applyFilters(initialJobs, newFilters));
   };
 
   return (

@@ -1,65 +1,115 @@
-'use client';
-
-import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
-const stats = [
-  { value: '5.000+', label: 'Vagas ativas' },
-  { value: '300+', label: 'Empresas parceiras' },
-  { value: '120+', label: 'Cursos indicados' },
-  { value: '98%', label: 'Atualização diária' },
-];
+interface HeroProps {
+  /** Tags mais frequentes nas vagas publicadas (vazio = a linha some). */
+  topTags?: string[];
+  /** Valor atual da busca (mantém o campo preenchido após pesquisar). */
+  initialQuery?: string;
+  initialContract?: string;
+}
 
-export function Hero() {
-  const [query, setQuery] = useState('');
+const CONTRACTS = ['CLT', 'PJ', 'Freelance'];
 
+/**
+ * Banner da página principal: título, busca, tags em alta e o mascote.
+ * Server component: a busca é um formulário GET para "/" (sem JavaScript no cliente).
+ */
+export function Hero({ topTags = [], initialQuery = '', initialContract = '' }: HeroProps) {
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-neutral-900 text-white p-5 sm:p-12 shadow-2xl border border-neutral-800">
-      {/* Background glow effect */}
-      <div className="absolute -top-24 -right-24 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+    <section className="overflow-hidden rounded-3xl bg-[#26292B] text-white">
+      <div className="flex flex-col-reverse items-center gap-8 px-4 py-8 sm:px-10 sm:py-10 md:flex-row md:justify-between md:gap-10 lg:px-14">
+        {/* Texto + busca */}
+        <div className="w-full min-w-0 md:max-w-[620px]">
+          <h1 className="text-[clamp(28px,5vw,44px)] font-bold leading-[1.1] tracking-tight">
+            Sua próxima vaga 100% Home Office está aqui.
+          </h1>
+          <p className="mt-3 text-base text-neutral-300 sm:text-lg">
+            Vagas remotas para profissionais do Brasil.
+          </p>
 
-      <div className="relative z-10 max-w-3xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/30 px-3 py-1 sm:px-4 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-accent mb-4 sm:mb-6">
-          ✨ Vagas 100% Remotas • Curadoria Profissional
-        </div>
-        
-        <h1 className="text-3xl sm:text-6xl font-extrabold tracking-tight text-white mb-4 sm:mb-6 leading-tight">
-          Trabalhe de onde quiser.{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-emerald-400">
-            Sem fronteiras.
-          </span>
-        </h1>
-        
-        <p className="text-sm sm:text-lg text-neutral-300 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
-          Plataforma centralizada de vagas remotas para o Brasil. Encontre oportunidades em tecnologia, design, dados e produtos.
-        </p>
+          <form action="/" method="get" role="search" className="mt-6">
+            <div className="flex flex-col gap-2 rounded-2xl bg-white p-2 sm:flex-row sm:items-center sm:gap-0 sm:p-1.5">
+              <label className="flex min-h-11 flex-1 items-center gap-2 px-2 sm:gap-2.5 sm:px-3">
+                <span className="sr-only">Buscar vagas por cargo, habilidade ou empresa</span>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#0A57D8"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="shrink-0"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-3.5-3.5" />
+                </svg>
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={initialQuery}
+                  placeholder="Cargo, habilidade, empresa"
+                  className="min-w-0 flex-1 bg-transparent text-[15px] text-neutral-900 placeholder-neutral-500 outline-none sm:text-base"
+                />
+              </label>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xl mx-auto mb-8 sm:mb-10">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cargo, tecnologia ou palavra-chave..."
-            className="w-full rounded-2xl bg-neutral-800 border border-neutral-700 px-4 py-3 sm:px-5 sm:py-4 text-sm sm:text-base text-white placeholder-neutral-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
-          />
-          <Link
-            href={query ? `/?q=${encodeURIComponent(query)}` : '/'}
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-accent px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base font-bold text-neutral-950 transition hover:bg-emerald-400 shadow-lg shadow-accent/25 shrink-0"
-          >
-            Explorar Vagas
-          </Link>
-        </div>
+              <label className="flex min-h-11 items-center border-neutral-200 px-3 sm:border-l">
+                <span className="sr-only">Tipo de contrato</span>
+                <select
+                  name="contract"
+                  defaultValue={initialContract}
+                  className="w-full cursor-pointer bg-transparent py-2 text-base font-medium text-neutral-800 outline-none sm:w-auto"
+                >
+                  <option value="">Contrato</option>
+                  {CONTRACTS.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-        {/* Cards de Estatísticas Responsivos */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-6 border-t border-neutral-800/80">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-neutral-800/50 backdrop-blur border border-neutral-700/50 rounded-2xl p-3 sm:p-4 text-center">
-              <div className="text-xl sm:text-3xl font-black text-accent mb-0.5 sm:mb-1">{stat.value}</div>
-              <div className="text-[10px] sm:text-xs font-medium text-neutral-400 uppercase tracking-wider">{stat.label}</div>
+              <button
+                type="submit"
+                className="tap-target rounded-xl bg-[#0A57D8] px-7 text-base font-bold text-white transition hover:bg-[#0848B0] sm:ml-1"
+              >
+                Buscar
+              </button>
             </div>
-          ))}
+          </form>
+
+          {topTags.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-neutral-200">Tags em alta</span>
+              <ul className="flex flex-wrap gap-2">
+                {topTags.map((tag) => (
+                  <li key={tag}>
+                    <Link
+                      href={`/?q=${encodeURIComponent(tag)}`}
+                      className="inline-flex min-h-8 items-center rounded-full bg-white/10 px-3 text-sm font-medium text-neutral-100 transition hover:bg-white/20"
+                    >
+                      #{tag}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
+
+        {/* Mascote */}
+        <Image
+          src="/brand/mascote.png"
+          alt="Mascote do TrabalheRemotoBrasil: um cachorro de fone de ouvido trabalhando no notebook numa cadeira de praia"
+          width={512}
+          height={512}
+          priority
+          sizes="(min-width: 1024px) 240px, (min-width: 768px) 200px, 128px"
+          className="h-32 w-32 shrink-0 md:h-[200px] md:w-[200px] lg:h-[240px] lg:w-[240px]"
+        />
       </div>
     </section>
   );
