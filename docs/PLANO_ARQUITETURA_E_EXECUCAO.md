@@ -137,6 +137,20 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 
 **Definition of Done:** `robots.txt` e `sitemap.xml` retornam 200; páginas de vaga têm meta tags únicas; `npm run build` passa.
 
+---
+### 📌 Status de Continuidade (atualizado em 07/11/2026)
+
+| Tarefa | Status | Comando local | Commit/Push | Observações |
+|--------|--------|---------------|-------------|-------------|
+| A1 | ✅ Concluído (local) | `frontend/src/app/robots.ts` | Pendente | `robots.txt` dinâmico com `sitemap` e `host` apontando para `NEXT_PUBLIC_SITE_URL`; disallow de `/admin/`, `/api/`, `/_next/` |
+| A2 | ✅ Concluído (local) | `frontend/src/app/sitemap.ts` | Pendente | `sitemap.xml` dinâmico com rotas estáticas + vagas ativas do Supabase (`fetchJobs`) |
+| A3 | ⏳ Pendente | — | — | Metadados dinâmicos em `/vaga/[slug]` |
+| A4 | ⏳ Pendente | — | — | ISR/revalidate nas rotas públicas |
+| A5 | ✅ Concluído | `.env.example` já existe | — | Já presente no repositório |
+| A6 | ⏳ Pendente | — | — | Corrigir referência quebrada a `docs/migrations/...` |
+
+**Próximo passo:** validar `npm run build`, commitar e pushar no `main` para acionar o deploy no Vercel.
+
 ### Sprint B — Busca, experiência e cursos recomendados com afiliado
 **Objetivo:** Melhorar relevância da busca e ativar recomendação de cursos com prioridade a links de afiliado.
 
