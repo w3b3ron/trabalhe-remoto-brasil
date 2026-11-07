@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: 'Loja — TrabalheRemotoBrasil',
 };
 
+export const revalidate = 300; // ISR: revalida a cada 5 min
+
 export default async function StorePage() {
   const products = await fetchProducts();
 

@@ -144,14 +144,14 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 |--------|--------|---------------|-------------|-------------|
 | A1 | ✅ Concluído (push) | `frontend/src/app/robots.ts` | ✅ `037df3b` | `robots.txt` dinâmico com `sitemap` e `host` apontando para `NEXT_PUBLIC_SITE_URL`; disallow de `/admin/`, `/api/`, `/_next/` |
 | A2 | ✅ Concluído (push) | `frontend/src/app/sitemap.ts` | ✅ `b0c33ec` | `sitemap.xml` dinâmico com rotas estáticas + vagas ativas do Supabase (`fetchJobs`) |
-| A3 | ⏳ Pendente | — | — | Metadados dinâmicos em `/vaga/[slug]` |
-| A4 | ⏳ Pendente | — | — | ISR/revalidate nas rotas públicas |
+| A3 | ✅ Concluído (push) | `frontend/src/app/vaga/[slug]/page.tsx` | Pendente | `generateMetadata` com keywords (tags), alternates canonical, Open Graph (type article, publishedTime), Twitter card summary_large_image |
+| A4 | ✅ Concluído (push) | Todas as rotas públicas | Pendente | `export const revalidate`: home=60s, vaga/[slug]=300s, cursos/loja=300s, sobre/contato=3600s, privacidade/termos=86400s |
 | A5 | ✅ Concluído | `.env.example` já existe | — | Já presente no repositório |
-| A6 | ⏳ Pendente | — | — | Corrigir referência quebrada a `docs/migrations/...` |
+| A6 | ✅ Concluído | `docs/migrations/2026-11-job-details.sql` | — | Arquivo existe; gap G11 resolvido (referência não está mais quebrada) |
 
-**Build Vercel:** commit `037df3b` enviado ao `main`. Novo build acionado automaticamente após correção do tipo `Robots` (Next.js 14 não exporta esse tipo). Aguardando resultado do deploy.
+**Build Vercel:** commits `b0c33ec`, `037df3b` e `447b25b` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente.
 
-**Próximo passo:** confirmar deploy no Vercel e validar `/robots.txt` e `/sitemap.xml` em produção.
+**Próximo passo:** commitar e pushar as alterações de A3/A4/A6 para acionar o novo deploy no Vercel; validar `/robots.txt`, `/sitemap.xml` e metadados de `/vaga/[slug]` em produção.
 
 ### Sprint B — Busca, experiência e cursos recomendados com afiliado
 **Objetivo:** Melhorar relevância da busca e ativar recomendação de cursos com prioridade a links de afiliado.

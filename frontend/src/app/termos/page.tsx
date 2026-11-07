@@ -4,6 +4,8 @@ export const metadata: Metadata = {
   title: 'Termos de Uso — TrabalheRemotoBrasil',
 };
 
+export const revalidate = 86400; // ISR: revalida a cada 24h
+
 export default function TermsPage() {
   return (
     <div className="max-w-2xl space-y-6">

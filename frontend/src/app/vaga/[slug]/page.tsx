@@ -15,6 +15,8 @@ interface Props {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
+export const revalidate = 300; // ISR: revalida a cada 5 min
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const job = await fetchJobBySlug(slug);
@@ -22,14 +24,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const company = job.company?.name ?? 'Remoto';
   const description = job.description.slice(0, 160);
+  const keywords = (job.tags ?? []).slice(0, 8);
+  const canonicalUrl = `${SITE_URL}/vaga/${job.slug}`;
 
   return {
     title: `${job.title} — ${company}`,
     description,
+    keywords: keywords.length ? [...keywords, job.title, company, 'vaga remota', 'trabalho remoto'] : [job.title, company, 'vaga remota', 'trabalho remoto'],
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `${job.title} — ${company}`,
       description,
-      url: `${SITE_URL}/vaga/${job.slug}`,
+      url: canonicalUrl,
+      siteName: 'TrabalheRemotoBrasil',
+      type: 'article',
+      publishedTime: job.published_at,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${job.title} — ${company}`,
+      description,
     },
   };
 }

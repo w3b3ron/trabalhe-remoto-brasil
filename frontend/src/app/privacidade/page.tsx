@@ -4,6 +4,8 @@ export const metadata: Metadata = {
   title: 'Política de Privacidade — TrabalheRemotoBrasil',
 };
 
+export const revalidate = 86400; // ISR: revalida a cada 24h
+
 export default function PrivacyPage() {
   return (
     <div className="max-w-2xl space-y-6">

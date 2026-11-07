@@ -4,6 +4,8 @@ export const metadata: Metadata = {
   title: 'Contato — TrabalheRemotoBrasil',
 };
 
+export const revalidate = 3600; // ISR: revalida a cada 1 hora
+
 export default function ContactPage() {
   return (
     <div className="max-w-2xl space-y-6">

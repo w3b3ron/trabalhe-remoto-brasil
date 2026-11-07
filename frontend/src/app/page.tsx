@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   title: 'TrabalheRemotoBrasil — Vagas Remotas para Brasileiros',
 };
 
+export const revalidate = 60; // ISR: revalida a cada 60s
+
 const TOP_TAGS = 4;
 
 /** Tags mais frequentes entre as vagas publicadas (empate: ordem alfabética). */
