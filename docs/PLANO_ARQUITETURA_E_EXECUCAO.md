@@ -149,10 +149,11 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 | A5 | ✅ Concluído | `.env.example` já existe | — | Já presente no repositório |
 | A6 | ✅ Concluído | `docs/migrations/2026-11-job-details.sql` | — | Arquivo existe; gap G11 resolvido (referência não está mais quebrada) |
 | B1 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `49d7491` | `fetchJobs` busca ilike em `title`, `description`, `tags` (overlaps) e `company.name`; `page.tsx` passa `searchParams.q` |
+| B2 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `3fbc732` | `fetchJobs` aplica overlaps('tags', filters.tags); page.tsx aceita searchParams.tag (string | string[]) e passa para fetchJobs |
 
-**Build Vercel:** commits `b0c33ec`, `037df3b`, `447b25b` e `49d7491` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente após B1.
+**Build Vercel:** commits `b0c33ec`, `037df3b`, `447b25b`, `49d7491` e `3fbc732` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente após B2.
 
-**Próximo passo:** validar deploy no Vercel e testar busca textual (`?q=`) na home; depois partir para B2 (filtro por `tags`).
+**Próximo passo:** validar deploy no Vercel e testar filtro por tags (`?tag=react`) na home; depois partir para B3 (cursos recomendados com `affiliate_url` no topo de `/vaga/[slug]`).
 
 ### Sprint B — Busca, experiência e cursos recomendados com afiliado
 **Objetivo:** Melhorar relevância da busca e ativar recomendação de cursos com prioridade a links de afiliado.
