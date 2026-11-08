@@ -38,6 +38,7 @@ export default async function Page({
   // Contrato e senioridade filtram no servidor; a busca por texto (?q=) é aplicada na
   // lista (título, empresa, descrição e tags).
   const jobs = await fetchJobs({
+    query: sp.q,
     contract_type: sp.contract,
     experience_level: sp.level,
   });

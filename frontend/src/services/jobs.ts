@@ -15,7 +15,13 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
     .order('published_at', { ascending: false });
 
   if (filters.query) {
-    query = query.ilike('title', `%${filters.query}%`);
+    const q = filters.query.trim();
+    if (q) {
+      // Busca textual em título, descrição, nome da empresa e tags
+      query = query.or(
+        `title.ilike.%${q}%,description.ilike.%${q}%,tags.cs.{${q}},company.name.ilike.%${q}%`
+      );
+    }
   }
   if (filters.contract_type) {
     query = query.eq('contract_type', filters.contract_type);
