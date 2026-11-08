@@ -148,10 +148,11 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 | A4 | ✅ Concluído (push) | Todas as rotas públicas | Pendente | `export const revalidate`: home=60s, vaga/[slug]=300s, cursos/loja=300s, sobre/contato=3600s, privacidade/termos=86400s |
 | A5 | ✅ Concluído | `.env.example` já existe | — | Já presente no repositório |
 | A6 | ✅ Concluído | `docs/migrations/2026-11-job-details.sql` | — | Arquivo existe; gap G11 resolvido (referência não está mais quebrada) |
+| B1 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `49d7491` | `fetchJobs` busca ilike em `title`, `description`, `tags` (overlaps) e `company.name`; `page.tsx` passa `searchParams.q` |
 
-**Build Vercel:** commits `b0c33ec`, `037df3b` e `447b25b` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente.
+**Build Vercel:** commits `b0c33ec`, `037df3b`, `447b25b` e `49d7491` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente após B1.
 
-**Próximo passo:** commitar e pushar as alterações de A3/A4/A6 para acionar o novo deploy no Vercel; validar `/robots.txt`, `/sitemap.xml` e metadados de `/vaga/[slug]` em produção.
+**Próximo passo:** validar deploy no Vercel e testar busca textual (`?q=`) na home; depois partir para B2 (filtro por `tags`).
 
 ### Sprint B — Busca, experiência e cursos recomendados com afiliado
 **Objetivo:** Melhorar relevância da busca e ativar recomendação de cursos com prioridade a links de afiliado.
