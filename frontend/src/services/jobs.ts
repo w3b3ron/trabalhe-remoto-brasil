@@ -111,6 +111,9 @@ export async function fetchRecommendedCourses(tags: string[] = []): Promise<Cour
     query = query.contains('related_tags', tags);
   }
 
+  // Ordena cursos com affiliate_url primeiro (prioridade de monetização)
+  query = query.order('affiliate_url', { ascending: false, nullsFirst: false });
+
   const { data, error } = await query;
 
   if (error) {

@@ -104,9 +104,25 @@ export default async function JobDetailPage({ params }: Props) {
   // "<" escapado para o JSON nunca fechar a tag <script>.
   const jsonLd = JSON.stringify(buildJobPostingJsonLd(job)).replace(/</g, '\\u003c');
 
+  // Vagas de exemplo/modelo (não vieram de scraper real) exibem aviso ao usuário
+  const isExampleJob = !job.source_site && !job.external_id;
+
   return (
     <div className="space-y-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
+
+      {isExampleJob && (
+        <section className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-100">
+          <p className="flex items-center gap-2 font-semibold">
+            <span>⚠️</span> Vaga de exemplo / modelo
+          </p>
+          <p className="mt-1">
+            Esta é uma vaga de teste/exemplo usada enquanto o sistema de
+            scraping não estiver em produção. Os dados serão substituídos por
+            vagas reais assim que o robô de atualização estiver ativo.
+          </p>
+        </section>
+      )}
 
       <JobDetail job={job} similarJobs={similarJobs} />
 
