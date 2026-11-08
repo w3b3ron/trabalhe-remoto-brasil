@@ -30,20 +30,23 @@ function topTagsOf(jobs: Job[]): string[] {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; contract?: string; level?: string }>;
+  searchParams: Promise<{ q?: string; contract?: string; level?: string; tag?: string | string[] }>;
 }) {
   const sp = await searchParams;
 
-  // Os filtros ficam só no banner (Hero), que envia ?q=&contract=&level= para esta página.
-  // Contrato e senioridade filtram no servidor; a busca por texto (?q=) é aplicada na
+  // Os filtros ficam só no banner (Hero), que envia ?q=&contract=&level=&tag= para esta página.
+  // Contrato, senioridade e tags filtram no servidor; a busca por texto (?q=) é aplicada na
   // lista (título, empresa, descrição e tags).
+  const tags = Array.isArray(sp.tag) ? sp.tag : sp.tag ? [sp.tag] : [];
+
   const jobs = await fetchJobs({
     query: sp.q,
     contract_type: sp.contract,
     experience_level: sp.level,
+    tags,
   });
 
-  const hasFilters = Boolean(sp.q || sp.contract || sp.level);
+  const hasFilters = Boolean(sp.q || sp.contract || sp.level || tags.length);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

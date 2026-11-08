@@ -30,6 +30,11 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
     query = query.eq('experience_level', filters.experience_level);
   }
 
+  if (filters.tags?.length) {
+    // Filtra vagas que possuam pelo menos uma das tags informadas (operador Postgres &&)
+    query = query.overlaps('tags', filters.tags);
+  }
+
   const { data, error } = await query;
 
   if (error) {
