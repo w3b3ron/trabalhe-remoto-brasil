@@ -151,10 +151,14 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 | B1 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `49d7491` | `fetchJobs` busca ilike em `title`, `description`, `tags` (overlaps) e `company.name`; `page.tsx` passa `searchParams.q` |
 | B2 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `3fbc732` | `fetchJobs` aplica overlaps('tags', filters.tags); page.tsx aceita searchParams.tag (string | string[]) e passa para fetchJobs |
 | B3 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/vaga/[slug]/page.tsx` | ✅ `74e76d9` | `fetchRecommendedCourses` ordena cursos com affiliate_url primeiro; página /vaga/[slug] exibe aviso âmbar quando vaga é exemplo/modelo (sem source_site e external_id, ou seja, não veio de scraper real) |
+| B4 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/vaga/[slug]/page.tsx` | ✅ `04bc173` | `incrementViewsCount` atualiza views_count de forma atômica e não bloqueante ao carregar /vaga/[slug] |
+| B5 | ✅ Concluído (push) | `frontend/src/types/index.ts`, `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `04bc173` | `JobFilters.sortBy` ('recent' | 'salary' | 'featured') aplicado em fetchJobs; page.tsx aceita searchParams.sort |
 
-**Build Vercel:** commits `b0c33ec`, `037df3b`, `447b25b`, `49d7491`, `3fbc732` e `74e76d9` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente após B3.
+**Sprint B concluído:** todas as tarefas B1–B5 implementadas e enviadas ao `main`.
 
-**Próximo passo:** validar deploy no Vercel; depois partir para B4 (incrementar views_count ao carregar /vaga/[slug]).
+**Build Vercel:** commits `b0c33ec`, `037df3b`, `447b25b`, `49d7491`, `3fbc732`, `74e76d9` e `04bc173` enviados ao `main`. Build anterior falhou por tipo `Robots` inexistente (Next.js 14); corrigido no commit `037df3b`. Novo build acionado automaticamente após B4/B5.
+
+**Próximo passo:** validar deploy no Vercel (testar `?q=`, `?tag=`, `?sort=salary` na home, e views_count em `/vaga/[slug]`); depois partir para o Sprint C (área de administração com links de afiliado).
 
 ### Sprint B — Busca, experiência e cursos recomendados com afiliado
 **Objetivo:** Melhorar relevância da busca e ativar recomendação de cursos com prioridade a links de afiliado.
