@@ -75,4 +75,5 @@ export interface JobFilters {
   contract_type?: string;
   experience_level?: string;
   tags?: string[];
+  sortBy?: 'recent' | 'salary' | 'featured';
 }

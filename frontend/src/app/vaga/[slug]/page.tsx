@@ -5,6 +5,7 @@ import {
   fetchJobBySlug,
   fetchRecommendedCourses,
   fetchSimilarJobs,
+  incrementViewsCount,
 } from '@/services/jobs';
 import { JobDetail } from '@/components/jobs/JobDetail';
 import type { Job } from '@/types';
@@ -95,6 +96,11 @@ export default async function JobDetailPage({ params }: Props) {
   const { slug } = await params;
   const job = await fetchJobBySlug(slug);
   if (!job) notFound();
+
+  // Incrementa views_count de forma não bloqueante (não aguarda para não atrasar o render)
+  incrementViewsCount(job.id).catch(() => {
+    // Erro já é logado dentro da função; apenas evita promise não tratada.
+  });
 
   const [courses, similarJobs] = await Promise.all([
     fetchRecommendedCourses(job.tags),

@@ -35,6 +35,19 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
     query = query.overlaps('tags', filters.tags);
   }
 
+  // Ordenação
+  if (filters.sortBy === 'salary') {
+    query = query.order('salary_max', { ascending: false, nullsLast: true });
+  } else if (filters.sortBy === 'featured') {
+    query = query.order('is_featured', { ascending: false }).order(
+      'published_at',
+      { ascending: false }
+    );
+  } else {
+    // Padrão: mais recentes primeiro
+    query = query.order('published_at', { ascending: false });
+  }
+
   const { data, error } = await query;
 
   if (error) {
@@ -43,6 +56,21 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
   }
 
   return (data as Job[]) ?? [];
+}
+
+/**
+ * Incrementa o contador de visualizações de uma vaga de forma atômica.
+ * Não falha silenciosamente se houver erro (apenas loga).
+ */
+export async function incrementViewsCount(jobId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('jobs')
+    .update({ views_count: supabase.raw('views_count + 1') })
+    .eq('id', jobId);
+  if (error) {
+    console.error('Erro ao incrementar views_count:', error.message);
+  }
 }
 
 export async function fetchJobBySlug(slug: string): Promise<Job | null> {
