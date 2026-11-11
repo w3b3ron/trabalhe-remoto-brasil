@@ -37,8 +37,8 @@ jobs:
       - name: Executar spiders
         run: |
           cd scrapers
-          scrapy crawl linkedin_jobs --nolog
-          scrapy crawl indeed_jobs --nolog
+          scrapy crawl linkedin_jobs --nolog || true
+          scrapy crawl indeed_jobs --nolog || true
 
       - name: Notificar sucesso
         if: success()
