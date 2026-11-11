@@ -77,3 +77,15 @@ export interface JobFilters {
   tags?: string[];
   sortBy?: 'recent' | 'salary' | 'featured';
 }
+
+// Fonte de scraping (Sprint E)
+export interface ScrapingSource {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  api_key: string | null;
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+}

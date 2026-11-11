@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { Product } from '@/types';
 import Image from 'next/image';
 
-export default function ProductDetailPage({ params }) {
+export default function ProductDetailPage({ params }: { params: { slug: string } }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export default function ProductDetailPage({ params }) {
     if (fetchError) {
       setError('Erro ao carregar produto: ' + fetchError.message);
     } else {
-      setProduct(fetchError.data as Product);
+      setProduct(data as Product);
     }
     setLoading(false);
   }

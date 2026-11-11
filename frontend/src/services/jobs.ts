@@ -37,7 +37,7 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
 
   // Ordenação
   if (filters.sortBy === 'salary') {
-    query = query.order('salary_max', { ascending: false, nullsLast: true });
+    query = query.order('salary_max', { ascending: false, nullsFirst: false });
   } else if (filters.sortBy === 'featured') {
     query = query.order('is_featured', { ascending: false }).order(
       'published_at',
@@ -64,12 +64,23 @@ export async function fetchJobs(filters: JobFilters = {}): Promise<Job[]> {
  */
 export async function incrementViewsCount(jobId: string): Promise<void> {
   const supabase = await createClient();
-  const { error } = await supabase
-    .from('jobs')
-    .update({ views_count: supabase.raw('views_count + 1') })
-    .eq('id', jobId);
+  // Usa RPC para incrementar atomicamente sem expor o valor atual
+  const { error } = await supabase.rpc('increment_views', { job_id: jobId });
   if (error) {
-    console.error('Erro ao incrementar views_count:', error.message);
+    // Fallback: tenta via update simples (pode não ser atômico em alta concorrência)
+    await supabase
+      .from('jobs')
+      .select('views_count')
+      .eq('id', jobId)
+      .single()
+      .then(async ({ data }) => {
+        if (data) {
+          await supabase
+            .from('jobs')
+            .update({ views_count: (data.views_count ?? 0) + 1 })
+            .eq('id', jobId);
+        }
+      });
   }
 }
 

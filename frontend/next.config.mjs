@@ -7,8 +7,9 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.supabase.co' },
     ],
   },
-  // Preparação para deploy standalone em Docker (Hostgator VPS - Fase 2)
-  output: 'standalone',
+  // output: 'standalone' — desabilitado na Vercel; reative apenas para build Docker (HostGator VPS).
+  // Para reativar: adicione NEXT_STANDALONE=1 nas variáveis de ambiente do build.
+  ...(process.env.NEXT_STANDALONE === '1' ? { output: 'standalone' } : {}),
 };
 
 export default nextConfig;
