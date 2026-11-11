@@ -6,10 +6,5 @@
   "installCommand": "cd frontend && npm install",
   "outputDirectory": "frontend/.next",
   "regions": ["gru1"],
-  "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
-    "NEXT_PUBLIC_SITE_URL": "@site_url"
-  },
   "crons": []
 }
