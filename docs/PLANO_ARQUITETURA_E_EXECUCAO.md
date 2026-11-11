@@ -37,24 +37,20 @@ O site já está em produção em `www.trabalheremotobrasil.com` e espelha o rep
 | Serviços | `fetchJobs`, `fetchJobBySlug`, `fetchSimilarJobs`, `fetchRecommendedCourses`, `fetchProducts` | Vagas semelhantes exibidas |
 | Scrapers | Spiders LinkedIn + Indeed (template), pipelines dedup/limpeza/upsert, GitHub Actions 2x/dia | Workflow configurado |
 | Infra | Dockerfile standalone, docker-compose, brand assets | Preparado para Fase 2 |
-| SEO completo | `robots.ts`, `sitemap.ts`, metadados dinâmicos, Open Graph, JSON-LD, ISR (revalidate) | Implementado (Sprint A) |
-| Busca avançada | `ilike` em title/description/tags/company.name, filtro por tags, ordenação | Implementado (Sprint B) |
-| Cursos recomendados | `fetchRecommendedCourses` ordenado por `affiliate_url` primeiro na página de vaga | Implementado (Sprint B) |
-| views_count | Incremento atômico e não-bloqueante em `/vaga/[slug]` | Implementado (Sprint B) |
-| Área de admin (login) | Página `/admin/login` com Supabase Auth, middleware de proteção, dashboard `/admin` | Implementado (Sprint C - C1) |
+| SEO parcial | Título e meta description na home | Presente |
 
 ### ⚠️ Gaps identificados (site ao vivo vs repositório)
 
 | # | Gap | Impacto | Prioridade |
 |---|-----|---------|------------|
-| ~~G1~~ | ~~`robots.txt` e `sitemap.xml` retornam 404~~ | ~~SEO~~ | ~~Alta~~ | ~~Resolvido (Sprint A)~~ |
-| ~~G2~~ | ~~Cursos recomendados não renderizados na página de vaga~~ | ~~Conversão/afiliado~~ | ~~Alta~~ | ~~Resolvido (Sprint B)~~ |
-| G3 | Sem área de admin para links de afiliado (cursos e produtos) | Monetização | Alta | Pendente (Sprint C) |
-| ~~G4~~ | ~~Busca limitada apenas a `title`; filtro por `tags` não aplicado~~ | ~~UX~~ | ~~Alta~~ | ~~Resolvido (Sprint B)~~ |
-| ~~G5~~ | ~~`views_count` não incrementado~~ | ~~Dados~~ | ~~Média~~ | ~~Resolvido (Sprint B)~~ |
-| ~~G6~~ | ~~Metadados dinâmicos ausentes em `/vaga/[slug]`~~ | ~~SEO/CTR~~ | ~~Alta~~ | ~~Resolvido (Sprint A)~~ |
-| ~~G7~~ | ~~Sem ISR/revalidate nas rotas públicas~~ | ~~Performance~~ | ~~Média~~ | ~~Resolvido (Sprint A)~~ |
-| G8 | Loja sem redirecionamento de afiliado funcional | Receita | Alta | Pendente (Sprint D) |
+| G1 | `robots.txt` e `sitemap.xml` retornam 404 | SEO | Alta |
+| G2 | Cursos recomendados não renderizados na página de vaga | Conversão/afiliado | Alta |
+| G3 | Sem área de admin para links de afiliado (cursos e produtos) | Monetização | Alta |
+| G4 | Busca limitada apenas a `title`; filtro por `tags` não aplicado | UX | Alta |
+| G5 | `views_count` não incrementado | Dados | Média |
+| G6 | Metadados dinâmicos ausentes em `/vaga/[slug]` | SEO/CTR | Alta |
+| G7 | Sem ISR/revalidate nas rotas públicas | Performance | Média |
+| G8 | Loja sem redirecionamento de afiliado funcional | Receita | Alta |
 | G9 | Scrapers dependem de LinkedIn (bloqueado); poucas fontes | Abastecimento | Alta |
 | G10 | Sem autenticação/candidatura do usuário | Engajamento | Média |
 | G11 | Referência quebrada a `docs/migrations/2026-11-job-details.sql` | Docs | Baixa |
@@ -108,9 +104,6 @@ Conforme `docs/database_schema.sql`. Tabelas: `companies`, `jobs`, `courses`, `p
 | 31/10/2026 | Docker & Infra | Dockerfile standalone + docker-compose.yml | **Concluído** |
 | 31/10/2026 | Deploy Vercel | Site em produção em `www.trabalheremotobrasil.com` | **Concluído** |
 | 06/11/2026 | Planejamento v2 | Plano consolidado com afiliados, admin, novas fontes de scrape | **Em Andamento** |
-| 09/11/2026 | Sprint A | Fundamentos de produção (SEO + estabilidade) — A1 a A6 | **Concluído** |
-| 09/11/2026 | Sprint B | Busca, experiência e cursos recomendados com afiliado — B1 a B5 | **Concluído** |
-| 09/11/2026 | Sprint C | Área de administração (links de afiliado) — C1 a C5 | **Em Andamento** |
 
 ## 6. Fontes Alternativas para Scraping de Vagas (além do LinkedIn)
 
@@ -151,8 +144,8 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 |--------|--------|---------------|-------------|-------------|
 | A1 | ✅ Concluído (push) | `frontend/src/app/robots.ts` | ✅ `037df3b` | `robots.txt` dinâmico com `sitemap` e `host` apontando para `NEXT_PUBLIC_SITE_URL`; disallow de `/admin/`, `/api/`, `/_next/` |
 | A2 | ✅ Concluído (push) | `frontend/src/app/sitemap.ts` | ✅ `b0c33ec` | `sitemap.xml` dinâmico com rotas estáticas + vagas ativas do Supabase (`fetchJobs`) |
-| A3 | ✅ Concluído (push) | `frontend/src/app/vaga/[slug]/page.tsx` | ✅ Concluído | `generateMetadata` com keywords (tags), alternates canonical, Open Graph (type article, publishedTime), Twitter card summary_large_image |
-| A4 | ✅ Concluído (push) | Todas as rotas públicas | ✅ Concluído | `export const revalidate`: home=60s, vaga/[slug]=300s, cursos/loja=300s, sobre/contato=3600s, privacidade/termos=86400s |
+| A3 | ✅ Concluído (push) | `frontend/src/app/vaga/[slug]/page.tsx` | Pendente | `generateMetadata` com keywords (tags), alternates canonical, Open Graph (type article, publishedTime), Twitter card summary_large_image |
+| A4 | ✅ Concluído (push) | Todas as rotas públicas | Pendente | `export const revalidate`: home=60s, vaga/[slug]=300s, cursos/loja=300s, sobre/contato=3600s, privacidade/termos=86400s |
 | A5 | ✅ Concluído | `.env.example` já existe | — | Já presente no repositório |
 | A6 | ✅ Concluído | `docs/migrations/2026-11-job-details.sql` | — | Arquivo existe; gap G11 resolvido (referência não está mais quebrada) |
 | B1 | ✅ Concluído (push) | `frontend/src/services/jobs.ts`, `frontend/src/app/page.tsx` | ✅ `49d7491` | `fetchJobs` busca ilike em `title`, `description`, `tags` (overlaps) e `company.name`; `page.tsx` passa `searchParams.q` |
@@ -262,4 +255,3 @@ Semanas 11-12: Sprint F (Qualidade + Fase 2 / Infra)
 ## 10. Próximo Passo Imediato
 
 Recomenda-se iniciar pelo **Sprint A**, pois o site já está ao vivo e corrigir SEO (`robots.txt`, `sitemap.xml`, metadados) traz impacto imediato no tráfego orgânico sem alterar a experiência do usuário.
-
