@@ -1,29 +1,49 @@
-import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  const supabase = await createServerClient();
+  let response = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(
+          cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]
+        ) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Rotas protegidas: apenas /admin/*
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const pathname = request.nextUrl.pathname;
+  const isLoginRoute = pathname === '/admin/login';
 
-  // Se está tentando acessar /admin/* e não tem sessão, redireciona para /admin/login
-  if (isAdminRoute && !session) {
-    const loginUrl = new URL('/admin/login', request.url);
-    return NextResponse.redirect(loginUrl);
+  // /admin/* exige sessão, EXCETO a própria página de login (evita loop de redirecionamento)
+  if (!user && !isLoginRoute) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  // Se está na página de login e já tem sessão, redireciona para /admin
-  if (request.nextUrl.pathname === '/admin/login' && session) {
+  // Já autenticado na tela de login: vai direto para o painel
+  if (user && isLoginRoute) {
     return NextResponse.redirect(new URL('/admin', request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
