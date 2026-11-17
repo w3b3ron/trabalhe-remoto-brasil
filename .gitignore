@@ -28,3 +28,8 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+# Scrapers
+scrapers/scrape_result.json
+scrapers/scrapers.log
+.pytest_cache/
+__pycache__/
