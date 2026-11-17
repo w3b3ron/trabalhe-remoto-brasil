@@ -201,15 +201,19 @@ O LinkedIn bloqueia scrap sem autenticação/Cloudflare. Ordem de implementaçã
 ### Sprint E — Scraping robusto e novas fontes
 **Objetivo:** Abastecimento contínuo de vagas com fontes além do LinkedIn.
 
-| # | Tarefa | Área | Esforço | Prioridade |
-|---|--------|------|---------|------------|
-| E1 | Spider/fonte via **Adzuna API** | Scrapers | 1 dia | Alta |
-| E2 | Spider/fonte via **Jooble API** | Scrapers | 1 dia | Alta |
-| E3 | Spider via **Remote OK** (JSON público) | Scrapers | 0.5 dia | Alta |
-| E4 | Spider via **Remotar** e/ou **Trampos.co** (scrap direto) | Scrapers | 1.5 dias | Média |
-| E5 | Reescrever spider do LinkedIn com **Playwright** (sessão persistida) | Scrapers | 2 dias | Média |
-| E6 | Alerta no GitHub Actions se scraper retornar 0 vagas ou falhar | DevOps | 0.5 dia | Média |
-| E7 | Executar scrapers em produção e validar persistência no Supabase | Scrapers | 0.5 dia | Alta |
+| # | Tarefa | Área | Esforço | Prioridade | Status (17/11/2026) |
+|---|--------|------|---------|------------|---------------------|
+| E0 | Pipeline de limpeza, deduplicação e persistência (empresa + vaga, upsert) | Scrapers | — | Alta | ✅ Pronto, com testes |
+| E1 | Spider/fonte via **Adzuna API** | Scrapers | 1 dia | Alta | ✅ Código pronto; ativa com `ADZUNA_APP_ID/KEY` |
+| E2 | Spider/fonte via **Jooble API** | Scrapers | 1 dia | Alta | ✅ Código pronto; ativa com `JOOBLE_API_KEY` (chave do domínio do Brasil) |
+| E3 | Spider via **Remote OK** (JSON público) | Scrapers | 0.5 dia | Alta | ✅ Código pronto; atribuição da fonte no site |
+| E4 | Spider via **Remotar** e/ou **Trampos.co** (scrap direto) | Scrapers | 1.5 dias | Média | ⏳ Pendente |
+| E5 | Reescrever spider do LinkedIn com **Playwright** (sessão persistida) | Scrapers | 2 dias | Média | ⏳ Pendente (os spiders `linkedin_jobs` e `indeed_jobs` atuais são modelos e não estão no workflow) |
+| E6 | Alerta no GitHub Actions se scraper retornar 0 vagas ou falhar | DevOps | 0.5 dia | Média | ✅ Workflow falha se 0 vagas (e-mail do GitHub) |
+| E7 | Executar scrapers em produção e validar persistência no Supabase | Scrapers | 0.5 dia | Alta | ⏳ Depende dos secrets e da migração `2026-11-setup-sprints-c-e.sql` |
+
+> Nota: a tela `/admin/scraping` (CRUD de fontes) é um cadastro; os spiders ainda não leem a tabela
+> `scraping_sources` e são configurados por variáveis de ambiente/secrets.
 
 **Definition of Done:** Pelo menos 3 novas fontes ativas populando o banco; alerta de falha configurado.
 

@@ -1,6 +1,7 @@
 # TrabalheRemotoBrasil
 
 Plataforma de vagas remotas com automação de scraping, recomendação de cursos e loja virtual integrada.
+Site: <https://www.trabalheremotobrasil.com>
 
 ---
 
@@ -8,83 +9,95 @@ Plataforma de vagas remotas com automação de scraping, recomendação de curso
 
 ```text
 TrabalheRemotoBrasil/
-├── .github/workflows/scrape-jobs.yml   # Automação de scraping (GitHub Actions)
-├── .gitignore
-├── README.md
-├── docker-compose.yml                  # Orquestração local (Next.js + Postgres)
+├── .github/workflows/scrape-jobs.yml   # Scraping agendado (GitHub Actions)
 ├── docs/
-│   ├── database_schema.sql             # Script SQL Supabase (tabelas + RLS + seed)
-│   ├── plano-site-vagas-remotas.md     # Plano inicial do site
-│   └── PLANO_ARQUITETURA_E_EXECUCAO.md # Plano consolidado de arquitetura e execução
-├── assets/brand/                       # Logos e identidade visual
+│   ├── database_schema.sql             # Tabelas + RLS + seed (Supabase)
+│   ├── migrations/                     # Migrações incrementais (rodar em ordem de data)
+│   ├── PLANO_ARQUITETURA_E_EXECUCAO.md # Plano de sprints e status
+│   └── plano-site-vagas-remotas.md
 ├── frontend/                           # Next.js 14 (App Router) + Tailwind CSS
-│   ├── Dockerfile                      # Build standalone para Hostgator VPS
-│   ├── public/
-│   ├── src/
-│   │   ├── app/                        # Rotas (App Router)
-│   │   ├── components/                 # Header, Hero, JobCard, JobFilters, ThemeProvider
-│   │   ├── lib/supabase/               # Clientes browser + server
-│   │   ├── services/                   # fetchJobs, fetchJobBySlug, fetchRecommendedCourses
-│   │   └── types/                      # Tipos do domínio (Job, Course, Product)
-│   └── README.md
-├── scrapers/                           # Web Scraping (Scrapy + Playwright)
-│   ├── pipelines/                      # Deduplicação, limpeza e persistência Supabase
-│   └── spiders/                        # Spiders por fonte (LinkedIn, Indeed)
-└── backend/                            # (Futura) Django + DRF
+│   ├── vercel.json                     # Build quando o Root Directory do Vercel é `frontend`
+│   └── src/
+│       ├── app/                        # Rotas públicas (/, /vaga, /cursos, /loja, /produto...) e /admin
+│       ├── components/                 # home/Hero, jobs/(JobCard, JobRow, JobList, JobDetail...), layout/Header
+│       ├── lib/supabase/               # Clientes browser + server
+│       ├── services/                   # Consultas ao Supabase (vagas, cursos, produtos)
+│       ├── middleware.ts               # Protege /admin/* (exceto /admin/login)
+│       └── types/                      # Tipos do domínio
+├── scrapers/                           # Scrapy (sem navegador) + pipelines + testes
+│   ├── spiders/                        # remoteok_jobs, adzuna_jobs, jooble_jobs
+│   ├── pipelines/cleaner.py            # Limpeza -> deduplicação -> persistência no Supabase
+│   ├── check_result.py                 # Falha o workflow se nenhuma vaga foi persistida
+│   └── tests/                          # pytest (unitários + crawl real contra servidor local)
+├── vercel.json                         # Build quando o Root Directory do Vercel é a raiz
+└── docker-compose.yml                  # Orquestração local (Next.js + Postgres)
 ```
 
 ---
 
-## Stack Tecnológica (Fase 1 — Vercel + Supabase)
+## Stack
 
-| Camada       | Tecnologia                          |
-|--------------|-------------------------------------|
-| **Frontend** | Next.js 14 (App Router) + React 18  |
-| **Estilo**   | Tailwind CSS (Apple HIG inspired)   |
-| **Banco**    | Supabase (PostgreSQL Serverless)    |
-| **Scraping** | Scrapy / Playwright + GitHub Actions|
-| **Deploy**   | Vercel (Fase 1) → Hostgator VPS (Fase 2) |
+| Camada       | Tecnologia                                   |
+|--------------|----------------------------------------------|
+| **Frontend** | Next.js 14 (App Router) + React 18 + Tailwind |
+| **Banco**    | Supabase (PostgreSQL + Auth + RLS)           |
+| **Scraping** | Scrapy + GitHub Actions                      |
+| **Deploy**   | Vercel (a partir de `main`)                  |
+
 ---
 
 ## Como Rodar
 
-### 1. Frontend (desenvolvimento local)
+### 1. Banco de Dados (Supabase)
+No SQL Editor, execute nesta ordem (todos os scripts de `migrations/` são idempotentes):
+1. `docs/database_schema.sql`
+2. `docs/migrations/2026-11-job-details.sql`
+3. `docs/migrations/2026-11-admin-rls.sql`
+4. `docs/migrations/2026-11-setup-sprints-c-e.sql` (`increment_views`, `scraping_sources`, RLS e unique de vagas)
+
+Crie o usuário administrador em **Authentication → Users → Add user**.
+
+### 2. Frontend
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local   # Preencha com credenciais Supabase
+cp .env.example .env.local   # NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm run dev
 ```
+No Vercel, defina as duas variáveis para **Production e Preview**. O painel admin fica em `/admin/login`
+(sem link no menu, de propósito).
 
-### 2. Banco de Dados (Supabase)
-1. Crie um projeto em [supabase.com](https://supabase.com).
-2. Copie `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` no `.env.local`.
-3. Execute o script `docs/database_schema.sql` no SQL Editor do Supabase.
-
-### 3. Scrapers (atualização automática)
+### 3. Scrapers
 ```bash
 cd scrapers
-pip install -r requirements.txt
-scrapy crawl linkedin_jobs
+pip install -r requirements.txt pytest
+python -m pytest -q                       # testes (inclui crawl real contra servidor local)
+
+export SUPABASE_URL=...  SUPABASE_SERVICE_KEY=...   # service key: nunca no frontend
+scrapy crawl remoteok_jobs                # sem chave de API
+ADZUNA_APP_ID=... ADZUNA_APP_KEY=... scrapy crawl adzuna_jobs
+JOOBLE_API_KEY=... scrapy crawl jooble_jobs
 ```
-Ou deixe rodando via **GitHub Actions** (`.github/workflows/scrape-jobs.yml`).
+Sem a chave, os spiders Adzuna e Jooble avisam e não fazem nada.
+
+**GitHub Actions** (`scrape-jobs.yml`, 08:00 e 20:00 UTC): configure os secrets `SUPABASE_URL` e
+`SUPABASE_SERVICE_KEY` (obrigatórios) e `ADZUNA_APP_ID`, `ADZUNA_APP_KEY`, `JOOBLE_API_KEY` (opcionais).
+O workflow falha, e o GitHub avisa por e-mail, se nenhuma vaga for persistida.
 
 ---
 
-## Próximos Passos
+## Status (17/11/2026)
 
-- [x] Configurar Next.js + Tailwind + TypeScript no `/frontend`
-- [x] Criar componentes Apple HIG (Header, Hero, JobCard, JobFilters, ThemeProvider)
-- [x] Conectar ao Supabase (client e server)
-- [x] Criar rotas: `/`, `/vaga/[slug]`, `/loja`, `/cursos`, `/sobre`, `/contato`, `/privacidade`, `/termos`
-- [x] Banco de dados: script SQL com tabelas, RLS e seed data
-- [x] Scrapers: spiders de exemplo (LinkedIn, Indeed) + pipelines de limpeza e persistência
-- [x] Automação: GitHub Actions para execução periódica
-- [x] Docker: Dockerfile + docker-compose para migração futura
-- [ ] Instalar dependências e testar `npm run dev` no `/frontend`
-- [ ] Configurar credenciais do Supabase em `.env.local`
-- [ ] Deploy na Vercel e configurar domínio próprio
-- [ ] Expandir spiders para mais fontes de vagas
+- [x] Site público: home com busca e filtros, página da vaga, cursos, loja, páginas institucionais
+- [x] SEO (robots, sitemap, metadados, ISR) e busca avançada
+- [x] Admin: login (Supabase Auth), CRUD de cursos, produtos e fontes de scraping
+- [x] Scrapers: pipeline, Remote OK, Adzuna e Jooble, com testes e workflow que falha de verdade
+- [ ] Rodar as migrações no Supabase de produção e configurar os secrets do GitHub
+- [ ] Primeira execução real dos scrapers e validação das vagas no site
+- [ ] Spiders Remotar/Trampos.co e reescrita do LinkedIn (Sprint E4/E5)
+- [ ] Sprint F: testes do frontend, CI e área do candidato
+
+Detalhes por sprint em `docs/PLANO_ARQUITETURA_E_EXECUCAO.md`.
 
 ---
 
