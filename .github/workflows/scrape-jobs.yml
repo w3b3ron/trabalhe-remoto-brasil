@@ -3,7 +3,8 @@
 # e o GitHub notifica por e-mail (não há mais `|| true` escondendo erros).
 #
 # Secrets necessários (Settings > Secrets and variables > Actions):
-#   SUPABASE_URL, SUPABASE_SERVICE_KEY
+#   SUPABASE_URL, SUPABASE_SERVICE_KEY            (obrigatórios)
+#   ADZUNA_APP_ID, ADZUNA_APP_KEY, JOOBLE_API_KEY (opcionais: ativam essas fontes)
 
 name: Atualizar Vagas Remotas
 
@@ -51,9 +52,16 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           SCRAPE_RESULT_FILE: scrape_result.json
+          # Opcionais: sem a chave, o spider avisa e é ignorado.
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
         run: |
           rm -f scrape_result.json
-          scrapy crawl remoteok_jobs
+          # Uma fonte com erro não impede as outras; o passo seguinte falha se nada foi persistido.
+          for spider in remoteok_jobs adzuna_jobs jooble_jobs; do
+            scrapy crawl "$spider" || echo "::warning::Spider $spider terminou com erro"
+          done
 
       - name: Validar resultado (falha se 0 vagas)
         run: python check_result.py scrape_result.json

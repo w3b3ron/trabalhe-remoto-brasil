@@ -10,10 +10,11 @@ pode ser usado. Por isso:
 """
 
 import html
-import re
 from typing import Any, Dict, Iterable, List
 
 import scrapy
+
+from spiders.common import strip_html
 
 API_URL = 'https://remoteok.com/api'
 
@@ -22,12 +23,6 @@ LOCATION_TERMS = (
     'worldwide', 'anywhere', 'global', 'brazil', 'brasil', 'latam',
     'latin america', 'south america', 'americas',
 )
-
-
-def strip_html(text: str, limit: int = 3000) -> str:
-    text = re.sub(r'<(br|/p|/li|/div|/h\d)\s*/?>', ' ', text or '', flags=re.I)
-    text = re.sub(r'<[^>]+>', '', text)
-    return re.sub(r'\s+', ' ', html.unescape(text)).strip()[:limit]
 
 
 def is_open_to_brazil(location: str) -> bool:

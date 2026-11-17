@@ -52,7 +52,7 @@ def slugify(text: str) -> str:
 class DataCleaningPipeline:
     """Valida campos obrigatórios e normaliza os dados antes de persistir."""
 
-    def process_item(self, item: Dict[str, Any], spider) -> Dict[str, Any]:
+    def process_item(self, item: Dict[str, Any], spider=None) -> Dict[str, Any]:
         for field in REQUIRED_FIELDS:
             value = item.get(field)
             if value is None or not str(value).strip():
@@ -122,7 +122,7 @@ class DeduplicationPipeline:
     def __init__(self):
         self.seen: set = set()
 
-    def process_item(self, item: Dict[str, Any], spider) -> Dict[str, Any]:
+    def process_item(self, item: Dict[str, Any], spider=None) -> Dict[str, Any]:
         key = (item['source_site'], item['external_id'])
         if key in self.seen:
             raise DropItem(f"Duplicata: {key}")
@@ -133,7 +133,8 @@ class DeduplicationPipeline:
 class SupabasePipeline:
     """Persiste empresa e vaga no Supabase usando a service key (ignora RLS)."""
 
-    def __init__(self, client=None):
+    def __init__(self, client=None, crawler=None):
+        self.crawler = crawler
         if client is None:
             from supabase import create_client  # import tardio: facilita testes
 
@@ -146,6 +147,14 @@ class SupabasePipeline:
         self.company_ids: Dict[str, str] = {}
         self.persisted = 0
         self.failed = 0
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler=crawler)
+
+    def _spider_name(self, spider=None) -> str:
+        spider = spider or getattr(self.crawler, 'spider', None)
+        return getattr(spider, 'name', 'desconhecido')
 
     def _company_id(self, item: Dict[str, Any]) -> Optional[str]:
         slug = slugify(item['company'])
@@ -166,7 +175,7 @@ class SupabasePipeline:
         self.company_ids[slug] = company_id
         return company_id
 
-    def process_item(self, item: Dict[str, Any], spider) -> Dict[str, Any]:
+    def process_item(self, item: Dict[str, Any], spider=None) -> Dict[str, Any]:
         try:
             item['company_id'] = self._company_id(item)
             if not item['company_id']:
@@ -184,9 +193,9 @@ class SupabasePipeline:
             logger.error('Erro ao persistir "%s": %s', item.get('title'), exc)
         return item
 
-    def close_spider(self, spider):
-        summary = {'spider': spider.name, 'persisted': self.persisted, 'failed': self.failed}
-        logger.info('Resultado %s: %s', spider.name, summary)
+    def close_spider(self, spider=None):
+        summary = {'spider': self._spider_name(spider), 'persisted': self.persisted, 'failed': self.failed}
+        logger.info('Resultado %s: %s', summary['spider'], summary)
         # Acumula o resultado de todos os spiders da execução para o workflow checar.
         results = []
         if os.path.exists(RESULT_FILE):
