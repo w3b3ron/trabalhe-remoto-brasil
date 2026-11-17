@@ -27,6 +27,13 @@ const CHIP_PILL =
  */
 export function JobDetail({ job, similarJobs }: JobDetailProps) {
   const company = job.company;
+  // Vagas importadas de agregadores: citamos a fonte e levamos o candidato ao anúncio original.
+  const SOURCE_LABELS: Record<string, string> = {
+    remoteok: 'Remote OK',
+    adzuna: 'Adzuna',
+    jooble: 'Jooble',
+  };
+  const sourceLabel = job.source_site ? SOURCE_LABELS[job.source_site] : undefined;
   const isRemoteOK = job.source_site === 'remoteok';
   const companyName = company?.name ?? 'Empresa não informada';
   const level = experienceLabel(job.experience_level);
@@ -237,7 +244,7 @@ export function JobDetail({ job, similarJobs }: JobDetailProps) {
             rel={isRemoteOK ? 'noopener' : 'noopener noreferrer'}
             className="tap-target flex min-h-[52px] items-center justify-center rounded-full bg-[#0A57D8] px-6 text-base font-bold text-white transition hover:bg-[#0848B0]"
           >
-            {isRemoteOK ? 'Ver vaga e candidatar-se ↗' : 'Candidatar-se no site da empresa ↗'}
+            {sourceLabel ? 'Ver vaga e candidatar-se ↗' : 'Candidatar-se no site da empresa ↗'}
           </a>
 
           <div className="flex gap-2.5">
@@ -246,17 +253,21 @@ export function JobDetail({ job, similarJobs }: JobDetailProps) {
           </div>
 
           <p className="text-[13px] leading-normal text-neutral-500 dark:text-neutral-400">
-            {isRemoteOK ? (
+            {sourceLabel ? (
               <>
                 Fonte:{' '}
-                <a
-                  href={job.apply_url}
-                  target="_blank"
-                  rel="noopener"
-                  className="font-semibold underline underline-offset-2"
-                >
-                  Remote OK
-                </a>
+                {isRemoteOK ? (
+                  <a
+                    href={job.apply_url}
+                    target="_blank"
+                    rel="noopener"
+                    className="font-semibold underline underline-offset-2"
+                  >
+                    {sourceLabel}
+                  </a>
+                ) : (
+                  <span className="font-semibold">{sourceLabel}</span>
+                )}
                 . Você será redirecionado para a página da vaga para concluir a candidatura.
               </>
             ) : (
