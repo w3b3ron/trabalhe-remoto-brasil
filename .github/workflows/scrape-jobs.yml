@@ -1,5 +1,9 @@
 # GitHub Actions: Atualização Automática de Vagas Remotas
-# Dispara 2x ao dia (08:00 e 20:00 UTC) para manter o banco fresco.
+# Dispara 2x ao dia (08:00 e 20:00 UTC). Se nenhum spider entregar vagas, o workflow FALHA
+# e o GitHub notifica por e-mail (não há mais `|| true` escondendo erros).
+#
+# Secrets necessários (Settings > Secrets and variables > Actions):
+#   SUPABASE_URL, SUPABASE_SERVICE_KEY
 
 name: Atualizar Vagas Remotas
 
@@ -9,10 +13,20 @@ on:
     - cron: '0 20 * * *'
   workflow_dispatch:  # Permite execução manual pelo painel do GitHub
 
+permissions:
+  contents: read
+
+concurrency:
+  group: scrape-jobs
+  cancel-in-progress: false
+
 jobs:
   scrape-jobs:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: scrapers
 
     steps:
       - name: Checkout do repositório
@@ -22,24 +36,24 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scrapers/requirements.txt
 
       - name: Instalar dependências
         run: |
-          pip install --upgrade pip
-          pip install -r scrapers/requirements.txt
-          playwright install --with-deps chromium
+          pip install -r requirements.txt pytest
 
-      - name: Configurar variáveis de ambiente
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> $GITHUB_ENV
-          echo "SUPABASE_SERVICE_KEY=${{ secrets.SUPABASE_SERVICE_KEY }}" >> $GITHUB_ENV
+      - name: Testes dos scrapers
+        run: python -m pytest -q
 
       - name: Executar spiders
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SCRAPE_RESULT_FILE: scrape_result.json
         run: |
-          cd scrapers
-          scrapy crawl linkedin_jobs --nolog || true
-          scrapy crawl indeed_jobs --nolog || true
+          rm -f scrape_result.json
+          scrapy crawl remoteok_jobs
 
-      - name: Notificar sucesso
-        if: success()
-        run: echo "Scraping concluído com sucesso!"
+      - name: Validar resultado (falha se 0 vagas)
+        run: python check_result.py scrape_result.json
