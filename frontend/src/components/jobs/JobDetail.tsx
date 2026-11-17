@@ -27,6 +27,7 @@ const CHIP_PILL =
  */
 export function JobDetail({ job, similarJobs }: JobDetailProps) {
   const company = job.company;
+  const isRemoteOK = job.source_site === 'remoteok';
   const companyName = company?.name ?? 'Empresa não informada';
   const level = experienceLabel(job.experience_level);
   const published = formatDate(job.published_at);
@@ -232,10 +233,11 @@ export function JobDetail({ job, similarJobs }: JobDetailProps) {
           <a
             href={job.apply_url}
             target="_blank"
-            rel="noopener noreferrer"
+            // Remote OK exige link "follow" de volta à vaga: sem nofollow.
+            rel={isRemoteOK ? 'noopener' : 'noopener noreferrer'}
             className="tap-target flex min-h-[52px] items-center justify-center rounded-full bg-[#0A57D8] px-6 text-base font-bold text-white transition hover:bg-[#0848B0]"
           >
-            Candidatar-se no site da empresa ↗
+            {isRemoteOK ? 'Ver vaga e candidatar-se ↗' : 'Candidatar-se no site da empresa ↗'}
           </a>
 
           <div className="flex gap-2.5">
@@ -244,8 +246,25 @@ export function JobDetail({ job, similarJobs }: JobDetailProps) {
           </div>
 
           <p className="text-[13px] leading-normal text-neutral-500 dark:text-neutral-400">
-            Você será redirecionado para a página de carreiras da empresa para concluir a
-            candidatura.
+            {isRemoteOK ? (
+              <>
+                Fonte:{' '}
+                <a
+                  href={job.apply_url}
+                  target="_blank"
+                  rel="noopener"
+                  className="font-semibold underline underline-offset-2"
+                >
+                  Remote OK
+                </a>
+                . Você será redirecionado para a página da vaga para concluir a candidatura.
+              </>
+            ) : (
+              <>
+                Você será redirecionado para a página de carreiras da empresa para concluir a
+                candidatura.
+              </>
+            )}
           </p>
         </aside>
       </div>
